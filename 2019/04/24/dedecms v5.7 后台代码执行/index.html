@@ -131,7 +131,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/16.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/17.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/18.png">
-<meta property="og:updated_time" content="2019-04-24T13:16:59.570Z">
+<meta property="og:updated_time" content="2019-04-24T13:23:20.048Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="dedecms v5.7 后台代码执行">
 <meta name="twitter:description" content="前言这是 dedecms 5.7 的一个后台任意代码执行的漏洞，因为整个处理过程比较长，所以认真地去跟了一遍 : )。 环境：dedecms 5.7  源码apache 2.4.38 + php 5.6.40vscode + xdebug 审计学习参考文章的 payload 如下：1/dede/tag_test_action.php?url=a&amp;amp;token=&amp;amp;partcode=&amp;#">
@@ -429,7 +429,7 @@
 <p><code>pv (PartView 类) 的 SetTemplet()</code> —&gt; <code>dtp (DedeTagParse 类) 的 LoadSource()</code> —&gt; <code>dtp 的 LoadTemplate()</code> —&gt; <code>dtp 的 LoadCache()</code> 。</p>
 <p>在 LoadCache() 中，因为已经使用过 payload，在 /data/tplcache/ 目录下存在 inc2 文件和 txt 文件，所以会继续往下执行，而不会在检查 inc2 和 txt 文件时返回  false。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/17.png" alt="17"></p>
-<p>这里引入的<code>$this-&gt;CacheFile</code>即前面创建的 inc2 文件。</p>
+<p>这里引入的<code>$this-&gt;CacheFile</code>，即前面创建的 inc2 文件。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/18.png" alt="18"></p>
 <p>接下来的代码将其中的数据还原成相应的类和属性，存入 dtp 的属性 Ctags 中，剩下的就和前面一样了。只不过第一次使用 payload 时，会将标签的内容进行一系列的解析，而第二次直接从 inc2 文件中读取并还原标签信息。</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>该漏洞一开始主要是因为 csrf_token() 没有起到检测身份的作用，且 partcode 可控，并在最后解析时没有过滤就传入了 eval() 中，造成了可以利用 csrf 实现任意代码执行。<br>关于代码审计，还是要多去思考，多去复现，认真跟踪一遍可控变量的处理 过程，才能加深理解 : )。</p>
