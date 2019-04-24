@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="https://fonts.googleapis.com/css?family=Muli:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="audit,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言这是 dedecms 5.7 的一个后台任意代码执行的漏洞，因为整个处理过程比较长，所以认真地去跟了一遍 : )。 环境：dedecms 5.7  源码apache 2.4.38 + php 5.6.40vscode + xdebug 审计学习参考文章的 payload 如下：1/dede/tag_test_action.php?url=a&amp;amp;token=&amp;amp;partcode=&amp;#">
+<meta name="keywords" content="audit">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dedecms v5.7 后台代码执行">
+<meta property="og:url" content="http://yoursite.com/2019/04/24/dedecms v5.7 后台代码执行/index.html">
+<meta property="og:site_name" content="ll">
+<meta property="og:description" content="前言这是 dedecms 5.7 的一个后台任意代码执行的漏洞，因为整个处理过程比较长，所以认真地去跟了一遍 : )。 环境：dedecms 5.7  源码apache 2.4.38 + php 5.6.40vscode + xdebug 审计学习参考文章的 payload 如下：1/dede/tag_test_action.php?url=a&amp;amp;token=&amp;amp;partcode=&amp;#">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/01.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/02.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/03.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/04.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/05.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/06.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/07.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/08.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/09.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/10.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/12.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/13.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/14.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/16.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/18.png">
+<meta property="og:updated_time" content="2019-04-24T13:16:59.570Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dedecms v5.7 后台代码执行">
+<meta name="twitter:description" content="前言这是 dedecms 5.7 的一个后台任意代码执行的漏洞，因为整个处理过程比较长，所以认真地去跟了一遍 : )。 环境：dedecms 5.7  源码apache 2.4.38 + php 5.6.40vscode + xdebug 审计学习参考文章的 payload 如下：1/dede/tag_test_action.php?url=a&amp;amp;token=&amp;amp;partcode=&amp;#">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/24/dedecms v5.7 后台代码执行/">
+
+
+
+
+
+  <title>dedecms v5.7 后台代码执行 | ll</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ll</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/24/dedecms v5.7 后台代码执行/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ll">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ll">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">dedecms v5.7 后台代码执行</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-24T12:00:35+08:00">
+                2019-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>这是 dedecms 5.7 的一个后台任意代码执行的漏洞，因为整个处理过程比较长，所以认真地去跟了一遍 : )。</p>
+<p>环境：<br>dedecms 5.7  <a href="https://github.com/LLfam/cms" target="_blank" rel="noopener"><strong>源码</strong></a><br>apache 2.4.38 + php 5.6.40<br>vscode + xdebug</p>
+<h3 id="审计学习"><a href="#审计学习" class="headerlink" title="审计学习"></a>审计学习</h3><p>参考文章的 payload 如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/dede/tag_test_action.php?url=a&amp;token=&amp;partcode=&#123;dede:ll name=&apos;source&apos; runphp=&apos;yes&apos;&#125;phpinfo();&#123;/dede:ll&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里的 /dede 目录是默认的后台管理目录，所以我们需要先登录后台。<br>接着看一下<code>/tag_test/action.php</code>文件。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require</span>(dirname(<span class="keyword">__FILE__</span>).<span class="string">"/config.php"</span>);</span><br><span class="line">...</span><br><span class="line">csrf_check();</span><br></pre></td></tr></table></figure>
+<p>在文件开头包含了<code>/dede/config.php</code>文件，其中定义了 csrf_check() 函数。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">csrf_check</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">global</span> $token;</span><br><span class="line">    <span class="keyword">if</span>(!<span class="keyword">isset</span>($token) || strcasecmp($token, $_SESSION[<span class="string">'token'</span>]) != <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">exit</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里可以看到该函数检测是否设置了 token，并且等于 SESSION 中的 token。<br>我们在<code>/tag_test_action.php</code>中 csrf_token() 的调用处打一个断点，用 payload 请求该页面。 </p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/01.png" alt="01"></p>
+<p>可以看到 SESSION 中的 token 默认为空，所以只要我们传入的 token 为空，就不会执行 exit。<br>继续看<code>tag_test_action.php</code>，从 payload 中可以看出我们可控的主要是 partcode 变量，这里我就仅展示相关代码。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/02.png" alt="02"></p>
+<p>这里 typeid 默认为0，所以直接实例化了一个 PartView 类。在其构造函数中，主要关注 $this-&gt;dtp。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">$this</span>-&gt;dtp = <span class="keyword">new</span> DedeTagParse();</span><br></pre></td></tr></table></figure>
+<p>看一下 DedeTagParse 类中定义的属性及其构造函数。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> $NameSpace = <span class="string">'dede'</span>;   <span class="comment">//标记的名字空间</span></span><br><span class="line"><span class="keyword">var</span> $TagStartWord = <span class="string">'&#123;'</span>;   <span class="comment">//标记起始</span></span><br><span class="line"><span class="keyword">var</span> $TagEndWord = <span class="string">'&#125;'</span>;     <span class="comment">//标记结束</span></span><br><span class="line"><span class="keyword">var</span> $TagMaxLen = <span class="number">64</span>;       <span class="comment">//标记名称的最大值</span></span><br><span class="line"><span class="keyword">var</span> $CharToLow = <span class="keyword">TRUE</span>;     <span class="comment">// TRUE表示对属性和标记名称不区分大小写</span></span><br><span class="line"><span class="keyword">var</span> $IsCache = <span class="keyword">FALSE</span>;      <span class="comment">//是否使用缓冲</span></span><br><span class="line"><span class="keyword">var</span> $TempMkTime = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">var</span> $CacheFile = <span class="string">''</span>;</span><br><span class="line"><span class="keyword">var</span> $SourceString = <span class="string">''</span>;    <span class="comment">//模板字符串</span></span><br><span class="line"><span class="keyword">var</span> $CTags = <span class="keyword">array</span>();           <span class="comment">//标记集合</span></span><br><span class="line"><span class="keyword">var</span> $Count = <span class="number">-1</span>;           <span class="comment">//$Tags标记个数</span></span><br><span class="line"><span class="keyword">var</span> $refObj = <span class="string">''</span>;          <span class="comment">//引用当前模板类的对象</span></span><br><span class="line"><span class="keyword">var</span> $taghashfile = <span class="string">''</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">if</span>($GLOBALS[<span class="string">'cfg_tplcache'</span>]==<span class="string">'Y'</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;IsCache = <span class="keyword">TRUE</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>回到<code>tag_test_action.php</code>中，在实例化 PartView 后，接着调用了其中的 SetTemplet 方法，并传入了 partcode。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$pv-&gt;SetTemplet($partcode, <span class="string">"string"</span>);</span><br></pre></td></tr></table></figure>
+<p>跟一下该方法。其中又调用了 dtp (DedeTagParse类) 的 LoadSource 方法，这里的 temp 是我们前面传入的 partcode。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SetTemplet</span><span class="params">($temp, $stype=<span class="string">"file"</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>($stype==<span class="string">"string"</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;dtp-&gt;LoadSource($temp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>跟进 LoadSource()。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">LoadSource</span><span class="params">($str)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="comment">// /include/common.inc.php line 24 define('DEDEDATA', DEDEROOT.'/data'); </span></span><br><span class="line">  <span class="keyword">$this</span>-&gt;taghashfile = $fileanme = DEDEDATA.<span class="string">'/tplcache/'</span>.md5($str).<span class="string">'.inc'</span>;</span><br><span class="line">  <span class="keyword">if</span>(!is_file($filename))</span><br><span class="line">  &#123;</span><br><span class="line">    file_put_contents($filename, $str);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">$this</span>-&gt;loadTemplate($filename);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>LoadSource 方法根据我们传入的 partcode 拼接了一个文件名，并将 partcode 写入该文件中。所以在 /data/tplcache/ 目录中多了一个 inc 文件，下面称其为 inc1 文件。其中是我们构造的 payload。<br>为了之后的测试方便，我将 /data/tplcache/ 目录下的所有 inc 和 txt 文件都删除了。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/03.png" alt="03"></p>
+<p>在 LoadSource() 的最后调用了 dtp 的 LoadTemplate() 方法，并传入了刚刚创建的文件名。继续跟进 LoadTemplate 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/04.png" alt="04"></p>
+<p>在该方法中，将我们一开始构造的 partcode 读入了 dtp 中的 SourceString 属性中。然后进入 LoadCache 方法。如果是第一次使用 payload，即在 /data/tplcache/ 中还没有存入相应的 cache 文件，则在执行完 LoadCache() 后会进入 else 分支，去执行 ParseTemplet()。跟进 LoadCache 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/05.png" alt="05"></p>
+<p>这里又拼接了两个文件，分别是 inc 和 txt 文件，这里生成的 inc 文件，下面称其为 inc2 文件。因为是第一次使用 payload，在 /data/tplcache/ 目录下只有前面生成的 inc1 文件，所以 LoadCache() 在第一次返回 false。并没有执行之后的代码。等分析完第一次使用 payload 后，我会对 LoadCache() 之后的代码进行分析。<br>接着返回 LoadTemplate() 中。在 else 分支中，我们进入了 dtp 的 ParseTemplet 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/06.png" alt="06"></p>
+<p>这里实例化了一个 DedeAttributeParse 类，主要负责对标签中的属性进行解析。看一下这个类中的基本属性的默认值。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> $sourceString = <span class="string">""</span>;</span><br><span class="line"><span class="keyword">var</span> $sourceMaxSize = <span class="number">1024</span>;</span><br><span class="line"><span class="keyword">var</span> $cAttributes = <span class="string">""</span>;</span><br><span class="line"><span class="keyword">var</span> $charToLow = <span class="keyword">TRUE</span>;</span><br></pre></td></tr></table></figure>
+<p>接着是一个 for 循环，其中主要做了以下几件事：</p>
+<ol>
+<li>由开始标签<code>{dede:</code>找到标签名<code>ll</code>，存入变量 tTagName 中。</li>
+<li>匹配结束标签<code>/}</code>或者<code>{/dede:ll}</code>，这里因为标签间有文本内容<code>phpinfo();</code>，所以 payload 以<code>{\dede:ll}</code>结尾。</li>
+<li>匹配标签名和属性等信息，存入变量 attStr 中；匹配标签间的文本内容，存入变量 innerText。</li>
+<li>调用 cAtt 的 SetSource 方法，其中传入 attStr，此时 attStr 中的值是<code>ll name=&#39;source&#39; runphp=&#39;yes&#39;</code>。将 cAtt 中的属性 cAttributes 实例化成 DedeAttribute 类，该类中属性的默认值为：<code>$Count = -1; $Items = &quot;&quot;</code>，将传入的 attStr 存入 cAtt-&gt;sourceString 中。</li>
+<li>在 cAtt 的 SetSource 方法的最后，调用了 cAtt 的ParseAttribute 方法。在该方法中，将前面实例化成 DedeAttribute 类的 cAttributes 中的属性 Items 设置为一个数组，其中存放了标签名<code>ll</code>和相应的各属性对。而 Count 是对其中的属性个数进行计数（不含标签名<code>ll</code>）。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/07.png" alt="07"></p>
+<ol start="6">
+<li>回到 for 循环中。</li>
+</ol>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$cAtt-&gt;SetSource($attStr); <span class="comment">// 设置属性</span></span><br><span class="line"><span class="keyword">if</span>($cAtt-&gt;cAttributes-&gt;GetTagName()!=<span class="string">''</span>) <span class="comment">// 是否有标签名ll</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">$this</span>-&gt;Count++;</span><br><span class="line">  $CDTag = <span class="keyword">new</span> DedeTag();</span><br><span class="line">  $CDTag-&gt;TagName = $cAtt-&gt;cAttributes-&gt;GetTagName(); <span class="comment">// ll</span></span><br><span class="line">  $CDTag-&gt;StartPos = $sPos; <span class="comment">// 0</span></span><br><span class="line">  $CDTag-&gt;EndPos = $i; <span class="comment">// 56</span></span><br><span class="line">  $CDTag-&gt;CAttribute = $cAtt-&gt;cAttributes; <span class="comment">// DedeAttribute类</span></span><br><span class="line">  $CDTag-&gt;IsReplace = <span class="keyword">FALSE</span>;</span><br><span class="line">  $CDTag-&gt;TagID = <span class="keyword">$this</span>-&gt;Count; <span class="comment">// 0</span></span><br><span class="line">  $CDTag-&gt;InnerText = $innerText; <span class="comment">// phpinfo();</span></span><br><span class="line">  <span class="keyword">$this</span>-&gt;CTags[<span class="keyword">$this</span>-&gt;Count] = $CDTag; <span class="comment">// 存入dtp中的属性CTags中</span></span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">$this</span>-&gt;IsCache) <span class="comment">// true</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">$this</span>-&gt;SaveCache(); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后进入了 dtp 的 SaveCache 方法，该方法和前面的 LoadCache 方法对应，其中创建了前面 LoadCache() 验证时不存在的 txt 文件，并将文件修改时间，即在 LoadCache() 中保存到 dtp 的属性 TempMkTime 中的值写入该 txt 文件。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/08.png" alt="08"></p>
+<p>之后根据在上面 for 循环时，存入 dtp 的属性 CTags 中的 DedeTag 类将标签信息写入 inc2 文件。在写之前会对标签间的文本内容<code>phpinfo();</code>进行检查。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/09.png" alt="09"></p>
+<p>这里因为 DEDEDISFUN 常量默认是没有定义的，所以并没有对我们的文本内容<code>phpinfo();</code>进行检查。<br>SaveCache() 执行完后，inc2 文件中就存有标签的的相应信息了。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/10.png" alt="10"></p>
+<p>并且我们会回到一开始定义的 PartView 对象（pv变量）的 SetTemplet 方法中，执行 PartView 类的 ParseTemplet 方法。之后回到最开始的<code>/dede/tag_test_action.php</code>中 ，先输出一些页面的显示格式，最后调用 PartView 的 Display 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/11.png" alt="11"></p>
+<p>之后的调用过程如下：</p>
+<p><code>pv (PartView类) 的 Display()</code> –&gt; <code>dtp (DedeTagParse类) 的 Display()</code> —&gt;<code>dtp 的 GetResult()</code> —&gt; <code>dtp 的 AssignSysTag()</code></p>
+<p>在 AssignSysTag() 中，从 dtp 的属性 CTags (DedeTag类) 中取出 TagName ，payload 中对应的是<code>ll</code>。进行相应的判断，如果属性 runphp 的值是 yes 则进入 RunPHP 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/12.png" alt="12"></p>
+<p>这里就说明了为什么 payload 中存在 runphp。跟进 RunPHP()。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/13.png" alt="13"></p>
+<p>这里的 refObj 其实就是前面的 CTag (DedeTag类) ，里面存放了标签中的信息，这里取出其中的文本内容，即<code>phpinfo();</code>，并传入 eval() 中执行。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/14.png" alt="14"></p>
+<p>经过上面的分析，可以知道 payload 中的条件主要包含以下几个：</p>
+<ol>
+<li>标签名不是<code>global</code>、<code>include</code>、<code>foreach</code>、<code>var</code>，才能在最后的 AssignSysTag() 中不进入 if-else if 的分支中。</li>
+<li>标签含有 runphp 属性，且值为<code>yes</code>。</li>
+</ol>
+<p>但其实当标签名是<code>global</code>时，在 AssignSysTag() 中进入第一个 if 分支，也可以造成任意代码执行。这里直接看该分支中的内容。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/15.png" alt="15"></p>
+<p>payload :<br><code>/dede/tag_test_action.php?token=&amp;partcode={dede:global%20function=%271;phpinfo()%27/}</code></p>
+<p>因为该 payload 不需要将任意执行的代码放进标签间的文本中，所以这里我用了前面说的第二种形式的标签写法，其类似 html 中的<code>&lt;img xxx /&gt;</code>。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/16.png" alt="16"></p>
+<p>到这里，整个 payload 的处理流程就结束了。<br>但是前面说了这是第一次使用 payload 的处理流程。在第二篇参考文章中，走的是已经使用过 payload 的处理流程。前面部分大致是：</p>
+<p><code>pv (PartView 类) 的 SetTemplet()</code> —&gt; <code>dtp (DedeTagParse 类) 的 LoadSource()</code> —&gt; <code>dtp 的 LoadTemplate()</code> —&gt; <code>dtp 的 LoadCache()</code> 。</p>
+<p>在 LoadCache() 中，因为已经使用过 payload，在 /data/tplcache/ 目录下存在 inc2 文件和 txt 文件，所以会继续往下执行，而不会在检查 inc2 和 txt 文件时返回  false。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/17.png" alt="17"></p>
+<p>这里引入的<code>$this-&gt;CacheFile</code>即前面创建的 inc2 文件。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/18.png" alt="18"></p>
+<p>接下来的代码将其中的数据还原成相应的类和属性，存入 dtp 的属性 Ctags 中，剩下的就和前面一样了。只不过第一次使用 payload 时，会将标签的内容进行一系列的解析，而第二次直接从 inc2 文件中读取并还原标签信息。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>该漏洞一开始主要是因为 csrf_token() 没有起到检测身份的作用，且 partcode 可控，并在最后解析时没有过滤就传入了 eval() 中，造成了可以利用 csrf 实现任意代码执行。<br>关于代码审计，还是要多去思考，多去复现，认真跟踪一遍可控变量的处理 过程，才能加深理解 : )。</p>
+<p>ref :<br><a href="https://mochazz.github.io/2018/03/29/dedecms%E6%9C%80%E6%96%B0%E5%90%8E%E5%8F%B0getshell/" target="_blank" rel="noopener">https://mochazz.github.io/2018/03/29/dedecms%E6%9C%80%E6%96%B0%E5%90%8E%E5%8F%B0getshell/</a><br><a href="https://xz.aliyun.com/t/2224" target="_blank" rel="noopener">https://xz.aliyun.com/t/2224</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/audit/" rel="tag"># audit</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/18/zzcms 8.2 代码审计/" rel="next" title="zzcms 8.2 代码审计">
+                <i class="fa fa-chevron-left"></i> zzcms 8.2 代码审计
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ll</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#审计学习"><span class="nav-number">2.</span> <span class="nav-text">审计学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ll</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
