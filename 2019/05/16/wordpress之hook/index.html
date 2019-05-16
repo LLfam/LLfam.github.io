@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="https://fonts.googleapis.com/css?family=Muli:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="audit,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言最近在复现 wordpress 以前的洞，看到的第一个就是和插件相关的。所以学习整理了一下 wordpress 插件的实现机制，希望能给之后的审计带来帮助 : ) hook什么是 hook 机制（钩子机制）？ 在 windows 中，hook 是一种用来劫持应用程序或者进程的消息的一种技术。对于 php 来说，我们也可以实现 hook 机制，用来添加自定义的内容。其主要的思想是，在需要自定义内">
+<meta name="keywords" content="audit">
+<meta property="og:type" content="article">
+<meta property="og:title" content="wordpress 之 hook">
+<meta property="og:url" content="http://yoursite.com/2019/05/16/wordpress之hook/index.html">
+<meta property="og:site_name" content="ll">
+<meta property="og:description" content="前言最近在复现 wordpress 以前的洞，看到的第一个就是和插件相关的。所以学习整理了一下 wordpress 插件的实现机制，希望能给之后的审计带来帮助 : ) hook什么是 hook 机制（钩子机制）？ 在 windows 中，hook 是一种用来劫持应用程序或者进程的消息的一种技术。对于 php 来说，我们也可以实现 hook 机制，用来添加自定义的内容。其主要的思想是，在需要自定义内">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/01.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/02.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/03.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/04.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/05.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/06.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/07.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/08.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/09.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/10.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/12.png">
+<meta property="og:updated_time" content="2019-05-16T18:12:26.281Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="wordpress 之 hook">
+<meta name="twitter:description" content="前言最近在复现 wordpress 以前的洞，看到的第一个就是和插件相关的。所以学习整理了一下 wordpress 插件的实现机制，希望能给之后的审计带来帮助 : ) hook什么是 hook 机制（钩子机制）？ 在 windows 中，hook 是一种用来劫持应用程序或者进程的消息的一种技术。对于 php 来说，我们也可以实现 hook 机制，用来添加自定义的内容。其主要的思想是，在需要自定义内">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/05/16/wordpress之hook/">
+
+
+
+
+
+  <title>wordpress 之 hook | ll</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ll</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/16/wordpress之hook/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ll">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ll">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">wordpress 之 hook</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-05-16T22:45:03+08:00">
+                2019-05-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>最近在复现 wordpress 以前的洞，看到的第一个就是和插件相关的。所以学习整理了一下 wordpress 插件的实现机制，希望能给之后的审计带来帮助 : )</p>
+<h3 id="hook"><a href="#hook" class="headerlink" title="hook"></a>hook</h3><p>什么是 hook 机制（钩子机制）？ 在 windows 中，hook 是一种用来劫持应用程序或者进程的消息的一种技术。对于 php 来说，我们也可以实现 hook 机制，用来添加自定义的内容。其主要的思想是，在需要自定义内容或添加功能的地方提前设置一个 hook，这个 hook 并不影响原本的内容。而当你需要添加或者修改该部分内容的时候，可以将扩展的类或者方法钩到该 hook 上。</p>
+<p>hook 机制的组成：</p>
+<ol>
+<li>一个存放所有已注册的 hook 的对象或数组。</li>
+<li>hook 类，里面存放了对应 hook 的相应信息，包括钩到这个 hook 上的所有函数等。</li>
+</ol>
+<p>接着，我们可以将插件中的函数钩到指定的 hook 中，在该 hook 被触发时，插件的功能将会实现。这里我简单实现了一个 hook 机制，我网站目录如下：</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/01.png" alt="01"></p>
+<p>具体代码如下：</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/02.png" alt="02"></p>
+<p>我先定义了一个全局数组 hook_arr，该数组用来存放所有注册的 hook，然后，我注册了一个叫作 p 的 hook，并将 hello 插件中的函数注册到该 hook 上。在 index.php 页面被渲染的时候，会触发该 hook，从而实现 hello 插件的功能。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/03.png" alt="03"></p>
+<p>可以看到，我预先注册了一个叫做 p 的 hook，该 hook 并不影响该页面的正常显示。而当开发者需要添加一些特定的内容或者功能时，直接将开发好的插件与特定的 hook 相连即可。</p>
+<p>在这篇<a href="https://www.cnblogs.com/whiterock/p/7286188.html" target="_blank" rel="noopener">文章</a>中，也有关于 hook 实现的小例子。</p>
+<h3 id="wordpress-之-hook"><a href="#wordpress-之-hook" class="headerlink" title="wordpress 之 hook"></a>wordpress 之 hook</h3><p>因为 hook 机制是事件驱动型架构中很重要的一部分，即一种通过监听事件状态并作出反应的设计，而在 wordpress 中，许多功能点其实就是对应了一个个的事件，比如，编辑文章、修改设置等。</p>
+<p>从上面可以看出，我们可以很容易地将一个插件和 wordpress 中定义好的 hook 相关联，从而实现丰富和扩展 wordpress 的目的。也正是因为 hook，wordpress 拥有了完备的生态圈，和数以万计的功能强大的插件及主题。</p>
+<p>在 wordpress 中，有两种 hook，<code>action hook</code> 和 <code>filter hook</code>。它们最大的区别就是，filter hook 会拿到 wordpress 提供的一个参数，然后对其进行修改，并返回该修改后的参数的值，而 action hook 不需要有 return 值。</p>
+<p>在参考文章中说到：</p>
+<blockquote>
+<p>在实际场景中，Filter Hooks 通常更专注于「内容」方面。例如说，Filter Hook  title_save_pre 是作用于文章标题的，  content_save_pre 就是作用于文章内容的。另一方面，Action Hooks 顾名思义，它偏向于「在 WordPress 做某件事时执行相应的动作」，还是拿  publish_post 为例，这个 Action Hook 就是在「任意一篇文章被发表时」被触发。</p>
+</blockquote>
+<p>当 wordpress 在执行某些动作的时候，因为动作一般不需要返回值，所以对应的是 action hook。而当 wordpress 需要展示内容的时候，允许用户对某些部分进行定制，从而需要接收用户修改后的值，此时对应的就是 filter hook。</p>
+<h4 id="action-hook"><a href="#action-hook" class="headerlink" title="action hook"></a>action hook</h4><p>在 wordpress 中，如何添加一个 action hook 呢？该功能对应的函数是 add_action()。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/04.png" alt="04"></p>
+<p>第一个参数 tag 是所指定的 hook，第二参数是在该 hook 被触发时所调用的函数，第三个参数是同一个 hook 中每个函数的优先级，第四个参数是所添加的 function_to_add 函数需要接收的参数个数。</p>
+<p>跟进 add_filter()。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/05.png" alt="05"></p>
+<p>在该函数中，先取了一个全局变量 wp_filter，该变量是 wordpress 的 hook 机制中很重要的一个变量，该变量中存放了所有已经注册的 hook 的信息。我们可以查看一下该变量的值，在根目录中的 index.php 文件的最后一行添加：<code>var_dump($wp_filter);</code>。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/06.png" alt="06"></p>
+<p>可以看到其中有很多 WP_Hook 类的值。找一下全局变量 wp_filter 的定义处。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/07.png" alt="07"></p>
+<p>在 plugin.php 文件开头，先包含了 class-wp-hook.php 文件，在该文件中定义了 WP_Hook 类，接着初始化了三个数组 wp_filter、wp_actions、wp_current_filter。</p>
+<p>回到 add_filter() 中，该函数通过传进来的 hook 去 wp_filter 中找，如果没有则实例化一个 WP_Hook 类，并将 hook 和新建的类通过键值对的形式相关联，存进 wp_filter 中。最后调用传进来的 hook，即 WP_Hook 类的 add_filter() 方法。跟进该方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/08.png" alt="08"></p>
+<p>在该方法中，先通过 hook、函数名和优先级的值生成了一个索引 idx，然后将和这个 hook 相关联的函数，根据优先级和 idx 的值存入该类的 callbacks 属性中，其中存放了与 hook 关联的函数的名字和接收参数的数量，最后通过 ksort() 对 callbacks 按优先级进行排序。</p>
+<p>到此，我们就将一个 hook 触发时需要执行的函数，与指定 hook 相关联。实际上，就是实例化了一个 WP_Hook 类，存进该函数的信息，并将该 WP_Hook 类以 hook 为索引放入了 wp_filter 数组中。</p>
+<p>由上面的分析看出，通过执行 add_action() ，可以将一个函数与指定的 hook 相关联，那我们如何触发 hook 从而调用关联的函数呢？在 wordpress 中，有数千个可以被使用的 hook，这里我通过叫作 wp_head 的 hook 来说明 hook 是如何被触发的。看如下代码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /wp-includes/general-template.php line 2608</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">wp_head</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    do_action( <span class="string">'wp_head'</span> );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到 wp_head() 函数中，就执行了 do_action() 函数，且传入了 wp_head hook。其实，通过和 add_action() 函数名的对比，大概也能猜到该函数的作用了，跟进 do_action() 。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/09.png" alt="09"></p>
+<p>还记得前面在定义 wp_filter 的同时，还定义了另外两个全局变量 wp_actions 和 wp_current_filter 吗？wp_filter 是用来存放所有的 hook 信息的，wp_actions 是用来记录这个 hook 被调用的次数的，wp_current_filter 是用来存放当前 hook 的，当与 hook 关联的函数被执行完后，就会从 wp_current_filter 从弹出该 hook。</p>
+<p>该函数对传进来的参数 arg 进行判断，取出所有的参数，存入 args 数组中。因为对于 action hook 来说，一般不需要参数，所以默认为空。然后调用了指定 hook 的 do_action 方法，在这里 hook 就是 wp_head。</p>
+<p>跟进 WP_Hook 类的 do_action()。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /wp-include/class-wp-hook.php line 308</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">do_action</span><span class="params">( $args )</span> </span>&#123;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;do_action = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;apply_filter( <span class="string">''</span>, $args );</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> ( ! <span class="keyword">$this</span>-&gt;nesting_level ) &#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;do_action = <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在 do_action() 中，先将 wp_head 中的 do_action 属性设置为 true，然后调用了 apply_filter() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/10.png" alt="10"></p>
+<p>因为这是 action hook，不需要接收 wordpress 传递过来以用来修改的参数，所以 value 默认为空。最后，将与 wp_head 这个 hook 关联的，存放在 callbacks 属性中的函数，通过 call_user_func_array() 执行。</p>
+<h4 id="filter-hook"><a href="#filter-hook" class="headerlink" title="filter hook"></a>filter hook</h4><p>因为所有的 hook 都存放在全局变量 wp_filter 中，所以 action hook 和 filter hook 实现大体相同。比如 title_save_pre 这个 hook，它可以实现动态更改标题的目的。</p>
+<p>wordpress 在这个 hook 上关联了一些函数。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /wp-includes/default-filters.php line 250</span></span><br><span class="line">add_filter( <span class="string">'title_save_pre'</span>,           <span class="string">'trim'</span>                                );</span><br></pre></td></tr></table></figure>
+<p>其实这个 add_filter()，我们已经见过了。在为 action hook 关联函数的时候，直接使用的是 add_action()，其中就调用了 add_filter()。接着，看一下在哪里可以触发这个 hook。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/11.png" alt="11"></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /wp-includes/customize/class-wp-customize-nav-menu-item-setting.php line 702</span></span><br><span class="line">$menu_item_value[<span class="string">'title'</span>] = wp_unslash( apply_filters( <span class="string">'title_save_pre'</span>, wp_slash( $menu_item_value[<span class="string">'title'</span>] ) ) );</span><br></pre></td></tr></table></figure>
+<p>可以看到，这个 hook 是通过 apply_filters() 触发的，并且传入 menu_item_value [ ‘ title ‘ ] 这个值。在传入之前，通过 wp_slash() 处理，实际是 wordpress 实现可以对数组调用的 addslashes()。跟进 apply_filters()。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/wordpress%E4%B9%8Bhook/12.png" alt="12"></p>
+<p>这里的 tag 变量，即 title_save_pre，由前面知道，都是注册进了 wp_filter 这个全局变量中，实际也是一个 WP_Hook 类，这里和触发 action hook 一样，都是调用了 WP_Hook 类的 apply_filters 方法。正如前面所说，和 action hook 不同的是，filter hook 传入了一个 value，实际就是 menu_item_value [ ‘ title ‘ ]，处理完之后，将修改好的值，传回给 wordpress 继续使用。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>在 wordpress 中，实现了两种 hook，一种是 action hook，一种是 filter hook。第一种 hook 通过 add_action() 可以关联一个函数，当该 hook 被 do_action() 触发的时候执行关联函数。第二种 hook 通过 add_filter() 关联一个函数，当该 hook 被 apply_filters() 触发的时候执行关联函数。</p>
+<p>ref :<br><a href="https://www.cnblogs.com/whiterock/p/7286188.html" target="_blank" rel="noopener">https://www.cnblogs.com/whiterock/p/7286188.html</a><br><a href="https://www.mywpku.com/understanding-and-using-the-wordpress-hook-system.html" target="_blank" rel="noopener">https://www.mywpku.com/understanding-and-using-the-wordpress-hook-system.html</a><br><a href="https://www.wpdaxue.com/wordpress-hook.html" target="_blank" rel="noopener">https://www.wpdaxue.com/wordpress-hook.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/audit/" rel="tag"># audit</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/24/dedecms v5.7 后台代码执行/" rel="next" title="dedecms v5.7 后台代码执行">
+                <i class="fa fa-chevron-left"></i> dedecms v5.7 后台代码执行
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">ll</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hook"><span class="nav-number">2.</span> <span class="nav-text">hook</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wordpress-之-hook"><span class="nav-number">3.</span> <span class="nav-text">wordpress 之 hook</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#action-hook"><span class="nav-number">3.1.</span> <span class="nav-text">action hook</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#filter-hook"><span class="nav-number">3.2.</span> <span class="nav-text">filter hook</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ll</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
