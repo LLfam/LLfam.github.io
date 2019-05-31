@@ -117,15 +117,15 @@
 <h3 id="审计学习"><a href="#审计学习" class="headerlink" title="审计学习"></a>审计学习</h3><p>参考文章的 payload 如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/dede/tag_test_action.php?url=a&amp;token=&amp;partcode=&#123;dede:ll name=&apos;source&apos; runphp=&apos;yes&apos;&#125;phpinfo();&#123;/dede:ll&#125;</span><br></pre></td></tr></table></figure>
 
-<p>这里的 /dede 目录是默认的后台管理目录，所以我们需要先登录后台。<br>接着看一下<code>/tag_test/action.php</code>文件。</p>
+<p>这里的 /dede 目录是默认的后台管理目录，所以我们需要先登录后台。<br>接着看一下<code>/dede/tag_test_action.php</code>文件。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require</span>(dirname(<span class="keyword">__FILE__</span>).<span class="string">"/config.php"</span>);</span><br><span class="line">...</span><br><span class="line">csrf_check();</span><br></pre></td></tr></table></figure>
 
 <p>在文件开头包含了<code>/dede/config.php</code>文件，其中定义了 csrf_check() 函数。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">csrf_check</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">global</span> $token;</span><br><span class="line">    <span class="keyword">if</span>(!<span class="keyword">isset</span>($token) || strcasecmp($token, $_SESSION[<span class="string">'token'</span>]) != <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">exit</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>这里可以看到该函数检测是否设置了 token，并且等于 SESSION 中的 token。<br>我们在<code>/tag_test_action.php</code>中 csrf_token() 的调用处打一个断点，用 payload 请求该页面。 </p>
+<p>这里可以看到该函数检测是否设置了 token，并且等于 SESSION 中的 token。<br>我们在<code>/dede/tag_test_action.php</code>中 csrf_token() 的调用处打一个断点，用 payload 请求该页面。 </p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/01.png" alt="01"></p>
-<p>可以看到 SESSION 中的 token 默认为空，所以只要我们传入的 token 为空，就不会执行 exit。<br>继续看<code>tag_test_action.php</code>，从 payload 中可以看出我们可控的主要是 partcode 变量，这里我就仅展示相关代码。</p>
+<p>可以看到 SESSION 中的 token 默认为空，所以只要我们传入的 token 为空，就不会执行 exit。<br>继续看<code>/dede/tag_test_action.php</code>，从 payload 中可以看出我们可控的主要是 partcode 变量，这里我就仅展示相关代码。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/dedecms_v5.7_%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/02.png" alt="02"></p>
 <p>这里 typeid 默认为0，所以直接实例化了一个 PartView 类。在其构造函数中，主要关注 $this-&gt;dtp。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">$this</span>-&gt;dtp = <span class="keyword">new</span> DedeTagParse();</span><br></pre></td></tr></table></figure>
