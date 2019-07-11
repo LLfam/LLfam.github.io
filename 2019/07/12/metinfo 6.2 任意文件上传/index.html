@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+<meta name="theme-color" content="#f8f5ec">
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="metinfo 6.2 任意文件上传"><meta name="keywords" content="audit, ll"><link rel="alternate" href="/default" title="ll"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://yoursite.com/2019/07/12/metinfo 6.2 任意文件上传/">
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":true,"latex":false};
+</script>
+
+    <title>metinfo 6.2 任意文件上传 - ll</title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">ll</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags
+          </li>
+      </a><a href="/links/">
+        <li class="mobile-menu-item">Links
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">ll</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags/">
+            Tags
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/links/">
+            Links
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            About
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">metinfo 6.2 任意文件上传
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-07-12
+        </span></div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#代码审计"><span class="toc-text">代码审计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#windows-目录名与-gbk"><span class="toc-text">windows 目录名与 gbk</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>昨天复现了 metinfo 6.2.0 的一个前台任意文件上传的漏洞，发现了一些其他利用方式~</p>
+<h2 id="代码审计"><a href="#代码审计" class="headerlink" title="代码审计"></a>代码审计</h2><p>为了复现该漏洞，所以搭建环境如下。</p>
+<blockquote>
+<p>windows + php 5.3.29</p>
+</blockquote>
+<p>安装完该 cms 后，我先从前台首页跟了一遍代码的执行流程，大致熟悉了一下路由的规则。</p>
+<p>index.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">define(<span class="string">'M_NAME'</span>, <span class="string">'index'</span>);</span><br><span class="line">define(<span class="string">'M_MODULE'</span>, <span class="string">'web'</span>);</span><br><span class="line">define(<span class="string">'M_CLASS'</span>, <span class="string">'index'</span>);</span><br><span class="line">define(<span class="string">'M_ACTION'</span>, <span class="string">'doindex'</span>);</span><br><span class="line"><span class="keyword">require_once</span> <span class="string">'./app/system/entrance.php'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>跟进 /app/system/entrance.php 。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/01.png" alt="01"></p>
+<p>文件最后调用了 load::module()，其中调用了 self::_load_class() 去调用相应类的相应方法。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">module</span><span class="params">($path = <span class="string">''</span>, $modulename = <span class="string">''</span>, $action = <span class="string">''</span>)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!$path) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!$path) $path = PATH_OWN_FILE;</span><br><span class="line">    <span class="keyword">if</span> (!$modulename) $modulename = M_CLASS;</span><br><span class="line">    <span class="keyword">if</span> (!$action) $action = M_ACTION;</span><br><span class="line">    <span class="keyword">if</span> (!$action) $action = <span class="string">'doindex'</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">self</span>::_load_class($path, $modulename, $action);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为漏洞发生在 uploadify 类的 doupfile 方法中，找了一下发现可以路由到该方法的文件为 admin/index.php。在该文件开头设置了一个常量。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">define(<span class="string">'IN_ADMIN'</span>, <span class="keyword">true</span>);</span><br></pre></td></tr></table></figure>
+
+<p>该常量和 gpc 中数据的过滤逻辑相关。在 metinfo 中有一个全局变量 $_M，其中的 form 键对应的值为 gpc 中的数据。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/02.png" alt="02"></p>
+<p>因为设置了常量 IN_ADMIN 的值，所以这里不会对 gpc 中数据调用 sqlinsert 函数进行处理，这样就不会把<code>\</code>转换成<code>/</code>了，这和后面的参考文章的 payload 有关。</p>
+<p>接着回到 uploadify 类中，因为 uploadify 类继承自 web 类，其构造方法中调用了 web 类的构造方法，web 类是一个前台基类，所以并没有做权限相关的验证。根据上面的分析，已经可以路由到触发漏洞的 doupfile 方法中。</p>
+<p>在 /app/system/include/module/uploadify.class.php。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/03.png" alt="03"></p>
+<p>这里 savepath 和 is_rename 都是 gpc 中的数据，我们可控，跟进 upload 方法。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">upload</span><span class="params">($formname)</span></span>&#123;</span><br><span class="line">  <span class="keyword">global</span> $_M;</span><br><span class="line">  $back = <span class="keyword">$this</span>-&gt;upfile-&gt;upload($formname);</span><br><span class="line">  <span class="keyword">return</span> $back;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中调用了 /app/system/include/class/upfile.class.php 中的 upload 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/04.png" alt="04"></p>
+<p>我把需要注意的地方圈起来了，自己跟一遍，大致就能发现构造 payload 的难点，第一个是文件后缀名的限制，第二个是目录名的限制。</p>
+<p>先说一下文件后缀名的限制，文件名在上传前经过了 iconv 函数的处理，而文件名是 savepath 和 savename 属性拼接来的，这两个属性都是我们可控的。而 iconv 这个函数在 php &lt; 5.4 中是存在截断问题的。</p>
+<p>iconv 截断：<code>https://www.cnblogs.com/milantgh/p/3602141.html</code></p>
+<p>所以我们可以构造类似<code>a.php%80.jpg</code>这样的文件名，绕过文件后缀名的限制，但是因为在前面的 set_savename 函数中，会将 savename 属性中最后一个点<code>.</code>之前的多余的点<code>.</code>替换成<code>_</code>，所以截断的 payload 需要放在 savepath 属性中，在最后和 savename 拼接文件名的时候形成类似<code>a.php%80.jpg</code>这样的文件名，然后进入 iconv 函数，截断后变成<code>a.php</code>，从而绕过后缀名的检测。</p>
+<p>所以我们的重点就放在了 savepath 属性上。在一开始触发漏洞的 doupfile 函数中，设置了 savepath 属性的值。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/05.png" alt="05"></p>
+<p>实际上，savepath 属性的值是<code>PATH_WEB.&#39;/upload&#39;.xx.&#39;/&#39;</code>，最后的<code>/</code>是在 path_standard 函数中加上的，其中 xx 是我们传参中 savepath 对应的值。这里要注意就是 savepath 结尾字符一定是<code>/</code>。</p>
+<p>回到 upload 方法，可以知道 savepath 属性需要满足以下要求。</p>
+<ul>
+<li>以<code>PATH_WEB. &#39;upload/&#39;</code>开头（已满足）</li>
+<li>不含<code>./</code></li>
+<li>进入 makedir 函数返回 true</li>
+</ul>
+<p>跟进 makedir 函数。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/06.png" alt="06"></p>
+<p>这里的逻辑就是会递归创建 savepath 指定的目录，如果成功则返回 true。</p>
+<p>我们重新理一下整个思路：</p>
+<ul>
+<li>路由到 uploadify 类的 doupfile 方法中。</li>
+<li>上传文件名的后缀在白名单中，如<code>a.jpg</code>，该值存放在 savename 属性中；将截断 payload 放在 savepath 参数中，如<code>shell.php%80</code>，在给 savepath 属性赋值的时候会拼接绝对路径，此时 savepath 属性的值为<code>PATH_WEB.&#39;upload/&#39;.&#39;shell.php%80&#39;.&#39;/&#39;</code>。</li>
+<li>savepath 属性和 savename 属性拼接成文件名 file_name，即<code>webroot/upload/shell.php%80/a.jpg</code>，进入 iconv 函数，截断后变成<code>webroot/upload/shell.php</code>，成功上传文件至 upload 目录。</li>
+</ul>
+<p>这里唯一需要注意的，就是 savepath 属性在进入 makedir 函数创建目录时，因为其目录名中存在特殊字符，所以可能会因为创建失败而返回 false。</p>
+<h2 id="windows-目录名与-gbk"><a href="#windows-目录名与-gbk" class="headerlink" title="windows 目录名与 gbk"></a>windows 目录名与 gbk</h2><p>当使用 %80 在 iconv 函数中截断后缀时，%80 经过 url 解码成特殊字符。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/07.png" alt="07"></p>
+<p>此时进入 makedir 函数的 savepath 属性值为<code>webroot/upload/shell.php�/</code>（savepath 属性值结尾拼接了<code>/</code>，我们实际传入的是<code>shell.php%80</code>）</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/08.png" alt="08"></p>
+<p>在 windows 的中文系统中，文件名的默认编码为 gbk，在 linux 中默认编码为 utf-8，这里<code>%80</code>对应的 gbk 字符可以作为 windows 下的目录名。</p>
+<p>gbk 编码：<code>https://www.23bei.com/tool-54.html#</code></p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/09.png" alt="09"></p>
+<p>所以该目录名合法，这样就通过了 makedir 的检测，成功上传了文件。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/10.png" alt="10"></p>
+<p>上传的 shell.php 文件因为 iconv 截断，所以是在 upload 目录下，而 makedir 创建的目录只是为了验证 savepath 属性指定的路径可创建，只要 makedir 能创建目录返回 true，就能到 iconv 截断处从而上传文件。</p>
+<p>参考文章中</p>
+<blockquote>
+<p>在 iconv 转换字符集时，如果字符串中存在源字符集序列不允许的字符时会造成截断。utf-8 在单字节时允许的范围为 0x00-0x7F。 </p>
+</blockquote>
+<p>所以实际上大于等于 %80 的字符都会造成 iconv 函数的截断，而测试发现，除了 %80 以外的单字节字符都无法成为 windows 下的合法目录名，所以在 makedir 创建目录时，就会返回 false，这样就到不了 iconv 截断处了。</p>
+<p>因为 windows 下目录分割符可以是<code>\</code>，所以参考文章中使用<code>..\</code>来实现目录穿越，这样就会在 file_exists 函数检测时判断目录存在，就不会进入 mkdir 中创建目录。这里需要注意的是，一开始我们说了 gpc 中的数据不会经过 sqlinsert 函数处理，所以<code>\</code>不会替换成<code>/</code>，这样在进入 makedir 函数前对 savepath 检测时，就不会检测到<code>./</code>。将 get 中的 savepath 参数设置为<code>shell.php%81/..\</code>，发现 file_exists 检测为 false，且 mkdir 无法创建该名字的目录，这就导致了 makedir 返回 false。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/15.png" alt="15"></p>
+<p>测试后发现<code>shell.php%81\..\</code>可以通过目录跳转使 file_exists 函数返回 true，即 makedir 返回 true。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/16.png" alt="16"></p>
+<p>那还有什么办法让 %80 以外的能造成 iconv 截断的单字节字符，能通过 makedir 函数对目录名的检测呢？</p>
+<p>回想一下，sql 中的宽字节注入。当数据库编码是 gbk 且单引号被转义时，在单引号前面输入 %df，即<code>1%df\&#39;</code>，这样进入数据库时，单字节<code>%df</code>和反斜线对应的单字节<code>%5c</code>，组成双字节<code>df5c</code>，即<code>運</code>，这样单引号就成功逃逸了。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/11.png" alt="11"></p>
+<p>同理，因为 windows 中目录名以 gbk 编码，所以假如我们使用任意大于等于 %80 的其他字符触发 iconv 截断，如 %88，而在 makedir 创建目录时，%88 对应的字符不合法。但因为 gbk 编码范围为 8140 - FEFE，所以我们可以在后面拼接一个单字节，和 %88 组成双字节后成为合法 gbk 字符，这样就可以创建 savepath 指定的目录了。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/12.png" alt="12"></p>
+<p>这样就通过了 makedir 的检测，并成功上传了文件。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/13.png" alt="13"></p>
+<p>可以看一下<code>885c</code>对应的 gbk 字符，和目录名中的字符是一样的。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/14.png" alt="14"></p>
+<p>在这个场景中，上传文件所在的目录与 makedir 创建的目录不是一个目录，所以 gbk 字符并不影响我们使用 webshell，但是如果 shell 文件在 makedir 创建的目录下的话，因为目录名中带有 gbk 字符，所以是不能直接访问到的。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/metinfo_v6.2_%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/17.png" alt="17"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>该漏洞的触发需要在 windows 条件下，且 php &lt; 5.4，这样才能利用 iconv 截断的特性去控制文件后缀，还有就是 savepath 指定的 windows 目录名要合法，可以通过<code>\..\</code>实现目录穿越绕过 file_exists 函数的检测，或者可以通过组合 gbk 字符使目录可创建。</p>
+<p>ref :</p>
+<p><code>https://xz.aliyun.com/t/5603</code></p>
+<p><code>http://www.yulegeyu.com/2019/06/18/Metinfo6-Arbitrary-File-Upload-Via-Iconv-Truncate/</code></p>
+<p><code>https://www.qqxiuzi.cn/zh/hanzi-gbk-bianma.php</code></p>
+<p><code>https://www.cnblogs.com/milantgh/p/3602141.html</code></p>
+<p><code>https://www.23bei.com/tool-54.html#</code></p>
+
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yoursite.com">ll</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yoursite.com/2019/07/12/metinfo 6.2 任意文件上传/">http://yoursite.com/2019/07/12/metinfo 6.2 任意文件上传/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
+        <div class="post-tags">
+            <a href="/tags/audit/">audit</a>
+            </div>
+        
+        <nav class="post-nav"><a class="next" href="/2019/05/22/loginizer 1.3.5 csrf漏洞/">
+        <span class="next-text nav-default">loginizer 1.3.5 csrf漏洞</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+        <a href="https://github.com/LLfam" class="iconfont icon-github" title="github"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2019<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">ll</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/lib/pjax/jquery.pjax.min.js"></script>
+  <script type="text/javascript" src="/lib/nprogress/nprogress.min.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</body>
+</html>
