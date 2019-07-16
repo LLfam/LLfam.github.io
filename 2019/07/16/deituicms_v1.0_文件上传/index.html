@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+<meta name="theme-color" content="#f8f5ec">
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="deituicms 1.0 任意文件上传"><meta name="keywords" content="audit, ll"><link rel="alternate" href="/default" title="ll"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://yoursite.com/2019/07/16/deituicms_v1.0_文件上传/">
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":true,"latex":false};
+</script>
+
+    <title>deituicms 1.0 任意文件上传 - ll</title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">ll</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags
+          </li>
+      </a><a href="/links/">
+        <li class="mobile-menu-item">Links
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">ll</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags/">
+            Tags
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/links/">
+            Links
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            About
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">deituicms 1.0 任意文件上传
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-07-16
+        </span></div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#环境搭建"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#代码审计"><span class="toc-text">代码审计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#漏洞复现"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#漏洞补丁"><span class="toc-text">漏洞补丁</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近开始实习，要开始早睡早起，改善作息了~</p>
+<p>实习主要是负责漏洞复现方面的工作，这样也蛮好，可以沉下心去审计是件很开心的事情 : )</p>
+<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>在 cnvd 上看到这个 cms 的一个文件上传漏洞，白天的时候审了一下，这里总结下漏洞发生的原因。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/01.png?raw=true" alt="01"></p>
+<p>迁出该 cms 的 v1.0 分支。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github.com:lrjxgl/deituiCMs.git</span><br><span class="line">git checkout 55f7</span><br></pre></td></tr></table></figure>
+
+<h2 id="代码审计"><a href="#代码审计" class="headerlink" title="代码审计"></a>代码审计</h2><p>还是从 index.php 开始，跟一遍代码逻辑。</p>
+<p>index.php </p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line 45</span></span><br><span class="line"><span class="keyword">require</span>(<span class="string">"./skymvc/skymvc.php"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>跟进 /skymvc/skymvc.php，其中对 gpc 中的数据做了 addslashes 处理。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/02.png?raw=true" alt="02"></p>
+<p>主要关注 /skymvc/skymvc.php 中的路由逻辑。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/03.png?raw=true" alt="03"></p>
+<p>在 /source/index/ 目录下主要是前台相关逻辑的代码，在 /source/admin/ 目录下是后台相关逻辑的代码。这里我们可以调用 /source/index/ 中某 xxControl 类中的 onxx 方法。</p>
+<p>在 /source/index/ 目录下发现和上传相关的类文件为 upload.ctrl.php，类名为 uploadControl，其中有很多和上传相关的方法。大部分方法中都调用了 uploadfile 函数去处理上传相关的行为，随便拿一个 onUpload 方法来看。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/04.png?raw=true" alt="04"></p>
+<p>跟进 upload 类的 uploadfile 方法。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/05.png?raw=true" alt="05"></p>
+<p>先通过 umkdir 函数创建目录，接着取出文件后缀名存入 f_type 变量，之后就没有对 f_type 变量进行检查，直接拼接到最后的文件名 uploadfile 变量中，并调用 move_file 方法上传文件。</p>
+<p>可以看到，实际上，中间有一段对文件类型进行验证的代码，跟进 getTrueType 方法。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/06.png?raw=true" alt="06"></p>
+<p>其中可以看到验证文件类型的方式，而该方式可以被绕过。当我们在一张正常的图片后面加上<code>&lt;?php phpinfo();?&gt;</code>时，在该检测中仍然会被认为是一张图片。</p>
+<p>在 getTrueType 方法中调用了 getfiletype 方法取出文件类型的简短名字。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/07.png?raw=true" alt="07"></p>
+<p>取出文件类型名后，回到 uploadfile 方法的检测逻辑中。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$fileType=<span class="keyword">$this</span>-&gt;getTrueType($FILE[<span class="string">'tmp_name'</span>]); </span><br><span class="line"><span class="keyword">if</span>(!in_array($fileType,<span class="keyword">$this</span>-&gt;sysallowtype) || !in_array($fileType,<span class="keyword">$this</span>-&gt;allowtype))&#123;</span><br><span class="line">  @unlink($FILE[<span class="string">'tmp_name'</span>]);</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">array</span>(<span class="string">'err'</span>=&gt;<span class="string">'文件格式'</span>.$fileType.<span class="string">'禁止上传'</span>,<span class="string">'filename'</span>=&gt;$FILE[<span class="string">'name'</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>sysallowtype 和 allowtype 属性的值定义在 upload 类的开头。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> $allowtype=<span class="keyword">array</span>(<span class="string">"gif"</span>,<span class="string">"jpg"</span>,<span class="string">"bmp"</span>,<span class="string">"png"</span>,<span class="string">'jpeg'</span>);</span><br><span class="line"><span class="keyword">public</span> $sysallowtype=<span class="keyword">array</span>(<span class="string">'gif'</span>,<span class="string">'jpg'</span>,<span class="string">'bmp'</span>,<span class="string">'png'</span>,<span class="string">'jpeg'</span>,<span class="string">'txt'</span>,<span class="string">'mpeg'</span>,<span class="string">"mp4"</span>,<span class="string">"ogg"</span>,<span class="string">'avi'</span>,<span class="string">'rm'</span>,<span class="string">'rmvb'</span>,<span class="string">'wmv'</span>,<span class="string">'flv'</span>,<span class="string">'mp3'</span>,<span class="string">'wav'</span>,<span class="string">'wma'</span>,<span class="string">'swf'</span>,<span class="string">'doc'</span>,<span class="string">'pdf'</span>,<span class="string">'zip'</span>,<span class="string">'tar'</span>,<span class="string">'svg'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>总结一下就是，我们可以控制上传文件的后缀名，因为 uploadfile 方法并没有对该值进行检测和过滤。只是对文件类型进行白名单检测，而在图片后面添加 php 代码仍然可以通过白名单检测。</p>
+<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p>先写个上传文件表单。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/08.png?raw=true" alt="08"></p>
+<p>上传一张正常图片，抓包后在图片内容后面添加恶意代码。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/09.png?raw=true" alt="09"></p>
+<p>在 Response 中可以取到上传文件路径。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/10.png?raw=true" alt="10"></p>
+<p>该文件在 /attach/ 目录下，具体路径和日期有关。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/11.png?raw=true" alt="11"></p>
+<h2 id="漏洞补丁"><a href="#漏洞补丁" class="headerlink" title="漏洞补丁"></a>漏洞补丁</h2><p>在最新的 v1.2 中，可以看到在 /skymvc/library/cls_upload.php 文件的 upload 类的 uploadfile 方法中，添加了对文件后缀 f_type 变量的过滤。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/12.png?raw=true" alt="12"></p>
+<p>尽管如此，但是文件类型还是 getTrueType 方法进行检测，所以我们还是可以上传一个结尾添加了恶意代码的图片，只不过后缀是白名单中的合法后缀。不过，如果我们找到一个文件包含的利用点，该上传文件仍然存在被用于 getshell 的风险。</p>
+<p><img src="https://github.com/LLfam/pictures/blob/master/blog/deituicms_v1.0_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/13.png?raw=true" alt="13"></p>
+
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yoursite.com">ll</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yoursite.com/2019/07/16/deituicms_v1.0_文件上传/">http://yoursite.com/2019/07/16/deituicms_v1.0_文件上传/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
+        <div class="post-tags">
+            <a href="/tags/audit/">audit</a>
+            </div>
+        
+        <nav class="post-nav"><a class="next" href="/2019/07/12/metinfo 6.2 任意文件上传/">
+        <span class="next-text nav-default">metinfo 6.2 任意文件上传</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+        <a href="https://github.com/LLfam" class="iconfont icon-github" title="github"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2019<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">ll</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/lib/pjax/jquery.pjax.min.js"></script>
+  <script type="text/javascript" src="/lib/nprogress/nprogress.min.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</body>
+</html>
