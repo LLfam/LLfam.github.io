@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+<meta name="theme-color" content="#f8f5ec">
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="php 中的转义与正则"><meta name="keywords" content="audit, ll"><link rel="alternate" href="/default" title="ll"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://yoursite.com/2019/07/17/php中的转义与正则/">
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":true,"latex":false};
+</script>
+
+    <title>php 中的转义与正则 - ll</title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">ll</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags
+          </li>
+      </a><a href="/links/">
+        <li class="mobile-menu-item">Links
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">ll</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags/">
+            Tags
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/links/">
+            Links
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            About
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">php 中的转义与正则
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-07-17
+        </span></div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#php-中的转义"><span class="toc-text">php 中的转义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#题目解析"><span class="toc-text">题目解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#转义与正则"><span class="toc-text">转义与正则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天机缘巧合审出国外某 cms 的一个 xss，其产生的主要原因是因为开发者对 php 中转义和正则的书写有误而导致的，这让我想起以前看的一篇文章。</p>
+<p>参考：<code>https://www.cdxy.me/?p=756</code></p>
+<h2 id="php-中的转义"><a href="#php-中的转义" class="headerlink" title="php 中的转义"></a>php 中的转义</h2><p>很多人可能知道在 php 中，双引号中的内容会转义，变量会被解析成对应的值，单引号中却不会。实际上，这样说不是很正确。</p>
+<p>对于变量来说，只有双引号中的变量能够被解析。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/01.png" alt="01"></p>
+<p>单引号中的<code>$</code>没有特殊含义，即不会和后面的字符组合成变量并解析。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/02.png" alt="02"></p>
+<p>对于转义字符来说，会稍微复杂点，规则如下。</p>
+<blockquote>
+<p>反斜线会根据其后面紧跟的字符是否需要转义和是否会导致解析出错而进行转义。</p>
+</blockquote>
+<p>对于反斜线本身来说，因为它是转义字符的开始标志，所以其本身在任何情况下都需要转义，无论单引号还是双引号中。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/03.png" alt="03"></p>
+<p>接下来主要看解析出错时的转义。我们都知道在 php 中字符串以单引号或双引号开始。因为没有研究过 php 源码，所以我猜测引号中内容的解析过程如下。</p>
+<p>php 看到第一个引号，开始解析字符串中的内容，一直解析到下一个没有被转义的对应引号结束。解析时，如果看到一个反斜线，会继续看反斜线后面紧跟的字符和该反斜线是否会组成一个转义字符，如果不会，则直接显示反斜线和该字符。而判断是否需要转义，主要有两点，第一是一些特殊字符，如制表符<code>\t</code>、回车符<code>\r</code>、换行符<code>\n</code>等。第二是是否会导致解析出错。</p>
+<p>在单引号中，第一个判断条件是不能用的，只有第二个条件才会影响反斜线的转义。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/04.png" alt="04"></p>
+<p>为什么这种情况下需要转义单引号呢？因为这个字符串是从单引号开始解析的，所以第一个单引号之后的单引号代表该字符串解析结束，若想在单引号中表示单引号就需要转义。最后的代码<code>echo &#39;&#39;&#39;;</code>在脚本中会直接报错。</p>
+<p>在双引号中，第一个判断条件可用于判断字符的转义情况。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/05.png" alt="05"></p>
+<p>总结一下，只有双引号可以解析被其包裹的变量，单引号不行。对于特殊字符，在双引号中要用转义字符表示（如<code>\r</code>、<code>\$</code>），<code>$</code>也需要转义是因为，双引号中可以解析变量，而这是变量名开始的标志。对于导致解析出错的字符（单引号中的单引号，双引号中的双引号），单引号和双引号中都需要转义。</p>
+<p>在上面单引号的示例的第一行代码中可以看到，当反斜线和后面紧跟的字符不会组成转义字符时（在双引号中<code>\r</code>等可表示特殊字符，单引号中不解析），反斜线和该字符会直接输出。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">php &gt; echo &apos;\r\n\abc&apos;;</span><br><span class="line">\r\n\abc</span><br></pre></td></tr></table></figure>
+
+<p>如下情况就会报错。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php &gt; echo &apos;\\&apos;&apos;;</span><br></pre></td></tr></table></figure>
+
+<p>因为反斜线在单、双引号中都需要转义，所以第一个反斜线会转义其后紧跟的反斜线，而第二个反斜线紧跟的单引号就没有反斜线去转义，多了个单引号导致字符串解析出错。</p>
+<h2 id="题目解析"><a href="#题目解析" class="headerlink" title="题目解析"></a>题目解析</h2><p>我们看一下参考文章的那道题目。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/06.png" alt="06"></p>
+<p>该代码逻辑就是，根据用户输入修改指定文件中的内容，将<code>$option=&#39;default&#39;</code>改为<code>$option=&#39;xx&#39;</code>。该场景可能出现在写配置信息时，如安装某 cms 时向文件写入数据库相关信息等。</p>
+<p>参考文章中，使用了三种方法，分别为<code>preg_replace</code>函数特性、<code>%0a</code>、<code>%00</code>（ addslashes 处理后为<code>\0</code>），这里就讲下第一种方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/07.png" alt="07"></p>
+<p>从输入到写入 file 变量的整个过程中，输入值的变化如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\&apos; --&gt; \\\&apos; --&gt; \\&apos;</span><br></pre></td></tr></table></figure>
+
+<p>先是<code>\&#39;</code>经过 addslashes 函数处理后，变成<code>\\\&#39;</code>，然后因为 preg_replace 函数的特性，变成<code>\\&#39;</code>，可以理解为第一个反斜线转义了一个反斜线。为什么说是 preg_replace 的特性呢？我在中间用双引号的解析变量特性将<code>\\\&#39;</code>赋值给了变量<code>$a</code>，打印后其值和输入相同，所以和 preg_replace 第二个参数处的双引号无关，我们也可以这样写。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/08.png" alt="08"></p>
+<p>直接模拟 str 变量进入第二个参数，输出的结果和上面一样，也会因为 preg_replace 的特性转义了反斜线。所以对于这题，输入<code>\&#39;</code>并利用 preg_replace 转义反斜线的特性即可逃逸单引号。</p>
+<h2 id="转义与正则"><a href="#转义与正则" class="headerlink" title="转义与正则"></a>转义与正则</h2><p>今天审到的类似如下代码，该过滤代码是为了防止 xss。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$a = preg_replace(<span class="string">"/[^a-zA-Z0-9.\ -_]+/"</span>, <span class="string">""</span>, $a);</span><br></pre></td></tr></table></figure>
+
+<p>结合上面知道，在 php 中，要在引号中表示反斜线有两种方式，反斜线转义反斜线<code>\\</code>，或者反斜线和其后内容不会组成转义字符时，反斜线表示为<code>\</code>字符。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/09.png" alt="09"></p>
+<p>可以看到，反斜线后内容需要转义时，会产生转义的效果，这样最后一行代码就少了闭合的双引号而导致报错了。</p>
+<p>在正则表达式中，也用反斜线来转义有特殊意义的字符。看如下代码。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/10.png" alt="10"></p>
+<p>我们本义是将<code>\</code>替换为空，可是 preg_replace 函数发生错误返回了 null。猜测下该函数的处理过程，首先 php 中双引号解析第一个参数内容，反斜线<code>\</code>和其后跟的<code>/</code>不组成转义字符，所以直接将<code>/\/</code>传给正则解析器解析，pcre 正则表达式必须包含在一对分割符中，即第一个字符<code>/</code>，所以该字符具有了特殊意义，而正则中也通过反斜线去转义字符，所以后面的表达式结束符<code>/</code>被转义了，这样就没有表达式结束符而导致报错了。</p>
+<p>再看一种写法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/11.png" alt="11"></p>
+<p>这种情况下，php 解析第一个参数时，反斜线转义了反斜线，变成<code>\/\</code>，到正则解析时还是和上面一样。</p>
+<p>在正则中，<code>\</code>的处理和 php 中有点不同。在 php 中，反斜线如果和紧跟字符不组成转义字符的话，反斜线没有转义功能，变成反斜线字符。而在正则中，反斜线如果和紧跟字符不组成转义字符或表示特殊含义时，反斜线会被去除。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/12.png" alt="12"></p>
+<p>首先，<code>\_abc</code>在 php 的双引号解析中，<code>_</code>本身不需要转义，所以<code>\</code>无转义功能表示为<code>\</code>字符，送到正则解析的内容为<code>\_abc</code>，正则中也没有转义字符<code>\_</code>，这样<code>\</code>没有起到转义效果，直接被去除，最后正则匹配到的内容为<code>_abc</code>。</p>
+<p>回到过滤 xss 的代码中。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$a = preg_replace(<span class="string">"/[^a-zA-Z0-9.\ -_]+/"</span>, <span class="string">""</span>, $a);</span><br></pre></td></tr></table></figure>
+
+<p>我猜这里本义应该是除了<code>a-z</code>、<code>A-Z</code>、<code>0-9</code>、<code>.</code>、<code>\</code>、<code>空格</code>、<code>-</code>、<code>_</code>外的字符全部替换为空，但实际效果却不是这样。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/13.png" alt="13"></p>
+<p>根据上面的思路，主要分析<code>\ -_</code>这个部分，php 双引号解析完后变成<code>\ -_</code>，因为空格本身就可以在引号中表示，所以<code>\</code>没有转义效果时表示为原字符，到正则解析时，空格也可以正常表示，所以反斜线<code>\</code>没有起到转义作用被去除，变成<code>空格-_</code>，而在 pcre 正则表达式的方括号<code>[]</code>中，<code>-</code>是有特殊意义的，<code>a-f</code>即从 a 对应的 ascii 码到 f 对应的 ascii 码范围的字符。因为这里的<code>-</code>没有被转义，实际匹配的是空格对应的 ascii 码到下划线对应的 ascii 范围内的字符。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/14.png" alt="14"></p>
+<p>只有最右边中的字符才不在<code>空格-_</code>的范围中。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/15.png" alt="15"></p>
+<p>要想达到原本的效果，只需要对<code>\</code>和<code>-</code>转义即可，为了方便，我去掉了<code>[]</code>中的非<code>^</code>字符。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/16.png" alt="16"></p>
+<p>转义过程如下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">php: /[a-zA-Z0-9.\\ \-_]+/</span><br><span class="line">正则: a-z、A-Z、0-9、.、\、-、_</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>刚刚看到开发者回复我了，原来是漏了转义<code>-</code>，看来我上面的修补方案写复杂了，可以看看简短的写法：<code>https://github.com/pluck-cms/pluck/issues/77</code></p>
+<p>开发还是要注意细节呀 : )</p>
+
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yoursite.com">ll</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yoursite.com/2019/07/17/php中的转义与正则/">http://yoursite.com/2019/07/17/php中的转义与正则/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
+        <div class="post-tags">
+            <a href="/tags/audit/">audit</a>
+            </div>
+        
+        <nav class="post-nav"><a class="next" href="/2019/07/16/deituicms_v1.0_文件上传/">
+        <span class="next-text nav-default">deituicms 1.0 任意文件上传</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+        <a href="https://github.com/LLfam" class="iconfont icon-github" title="github"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2019<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">ll</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/lib/pjax/jquery.pjax.min.js"></script>
+  <script type="text/javascript" src="/lib/nprogress/nprogress.min.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</body>
+</html>
