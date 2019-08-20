@@ -161,12 +161,12 @@
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/java_%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8Ermi/06.png" alt="06"></p>
 <p>所以，如果我们想要序列化某个类，只需要让其实现 Serializable 接口即可。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/java_%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8Ermi/07.png" alt="07"></p>
-<p>我们可以自定义一个 Person 类，并其对象序列化写入文件。</p>
+<p>我们可以自定义一个 Person 类，并将其对象序列化写入文件。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/java_%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8Ermi/08.png" alt="08"></p>
 <p>根据前面分析，我们也可以让需要序列化的类实现 Externalizable 接口。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Externalizable</span> <span class="keyword">extends</span> <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">writeExternal</span><span class="params">(ObjectOutput out)</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">readExternal</span><span class="params">(ObjectInput in)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Externalizable</span> <span class="keyword">extends</span> <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">writeExternal</span><span class="params">(ObjectOutput out)</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">readExternal</span><span class="params">(ObjectInput in)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>Externailzable 是 Serializable 的子类，其中定义了 writeExternal() 和 readExternal() 这两个方法，需要自己实现序列化和反序列化的读写操作，可以保存 transient 修饰的变量，且必须包含一个自己的无参数构造方法（默认隐式的也可以）。    </p>
+<p>Externailzable 是 Serializable 的子类，其中定义了 writeExternal() 和 readExternal() 这两个方法，需要自己实现序列化和反序列化的读写操作，可以保存 transient 修饰的变量，且必须包含一个无参数构造方法（默认隐式的也可以）。    </p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/java_%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8Ermi/09.png" alt="09"></p>
 <p>在前面提到，我们可以实现 readObject() 和 writeObject() 方法自定义反序列化策略。在对象反序列化时，会调用相应类的 readObject() 方法，我们可以实现该方法，并在其中添加弹计算器的代码。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/java_%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8Ermi/10.png" alt="10"></p>
@@ -180,7 +180,7 @@
 <p>Remote</p>
 <p>远程实现类需要继承 Remote 接口，只有继承了 Remote 接口中的方法才可以被远程调用。</p>
 <p>RemoteException</p>
-<p>RemoteException 是所有在远程调用中所抛出异常的超类，所有能被远程调用的方法声明，都需要处理该异常。</p>
+<p>RemoteException 是所有在远程调用中所抛出异常的超类，所有能被远程调用的方法声明中，都需要处理该异常。</p>
 <p>Naming</p>
 <p>提供向注册中心 rmi registry 保存远程对象引用，或者从注册中心获取远程对象引用的方法，这个类中的方法是静态的，每一个方法都包含了一个类型为 String 的 name 参数，这个参数是 url 格式，如 xx://hsot:port/name。</p>
 <p>Registry</p>
