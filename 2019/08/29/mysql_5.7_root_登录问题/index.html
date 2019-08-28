@@ -115,7 +115,7 @@
   </div><div class="post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>刚刚看到小密圈里，p 神又讲到了关于 mysql 登录的问题，想到前段时间实习的时候，遇到过类似的问题，这是当时做的一些简单的测试，发出来记录一下 : )</p>
 <p>渗透测试中，发现有 phpmyadmin，用注入拿到的数据库账户密码却无法连接。下面是自己的一点测试，可以当做参考，不能保证完全正确，感兴趣的就往下读吧。</p>
 <h2 id="攻防练习"><a href="#攻防练习" class="headerlink" title="攻防练习"></a>攻防练习</h2><p>这是在实习的时候，师傅们根据真实环境，给我们实习生搭建的一个简单的靶场。</p>
-<p>文件上传界面，ypzw 参数存在 sql 注入，id 写任意值，当 ypzw 输入单引号时报错，查看报错语句即可构造 payload。</p>
+<p>文件上传界面，ypzw 参数存在 sql 注入，id 写任意值，当 ypzw 输入单引号时报错，查看报错语句即可构造 payload。这靶场不难，但是值得思考的是，在文件上传的请求中，其他参数存在注入问题。所以，任何地方都有可能存在各种安全问题，还是要细心。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/01.png" alt="01"></p>
 <p>进后台后，友情链接的上传图片处可以上传任意 php 文件，上传文件路径需要爆破，格式<code>/uploadfile/时间/文件名.php</code>，类似<code>/uploadfile/2019-7-30/1.php</code>，文件名从数字 1 开始递增。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/03.png" alt="03"></p>
