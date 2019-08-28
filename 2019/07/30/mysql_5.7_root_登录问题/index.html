@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+<meta name="theme-color" content="#f8f5ec">
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="mysql 5.7 root 登录问题"><meta name="keywords" content="other, ll"><link rel="alternate" href="/default" title="ll"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://yoursite.com/2019/07/30/mysql_5.7_root_登录问题/">
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":true,"latex":false};
+</script>
+
+    <title>mysql 5.7 root 登录问题 - ll</title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">ll</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags
+          </li>
+      </a><a href="/links/">
+        <li class="mobile-menu-item">Links
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">ll</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags/">
+            Tags
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/links/">
+            Links
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            About
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">mysql 5.7 root 登录问题
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-07-30
+        </span></div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#攻防练习"><span class="toc-text">攻防练习</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#环境搭建"><span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#回到靶场"><span class="toc-text">回到靶场</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>刚刚看到小密圈里，p 神又讲到了关于 mysql 登录的问题，想到前段时间实习的时候，遇到过类似的问题，这是当时做的一些简单的测试，发出来记录一下 : )</p>
+<p>渗透测试中，发现有 phpmyadmin，用注入拿到的数据库账户密码却无法连接。下面是自己的一点测试，可以当做参考，不能保证完全正确，感兴趣的就往下读吧。</p>
+<h2 id="攻防练习"><a href="#攻防练习" class="headerlink" title="攻防练习"></a>攻防练习</h2><p>这是在实习的时候，师傅们根据真实环境，给我们实习生搭建的一个简单的靶场。</p>
+<p>文件上传界面，ypzw 参数存在 sql 注入，id 写任意值，当 ypzw 输入单引号时报错，查看报错语句即可构造 payload。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/01.png" alt="01"></p>
+<p>进后台后，友情链接的上传图片处可以上传任意 php 文件，上传文件路径需要爆破，格式<code>/uploadfile/时间/文件名.php</code>，类似<code>/uploadfile/2019-7-30/1.php</code>，文件名从数字 1 开始递增。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/03.png" alt="03"></p>
+<p>在 phpinfo 中发现没有限制命令执行的函数，可以将网站源码和日志等文件打包下载下来，为后续深入作准备。</p>
+<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>因为 mysql 5.7 开始，需要用 sudo 模式才能以 mysql 中的 root 身份登录服务器，所以先以 mysql 5.6 为例，虚拟机为 ubuntu 18.04。</p>
+<p>方便大家搭建，环境搭建代码如下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">复制 mysql 5.6 安装包到桌面</span><br><span class="line"></span><br><span class="line">tar -xf mysql-server_5.6.45-1debian9_amd64.deb-bundle.tar</span><br><span class="line"></span><br><span class="line">sudo dpkg -i libmysqld-dev_5.6.45-1debian9_amd64.deb mysql-server_5.6.45-1debian9_amd64.deb mysql-testsuite_5.6.45-1debian9_amd64.deb mysql-server_5.6.45-1debian9_amd64.deb mysql-community-test_5.6.45-1debian9_amd64.deb mysql-community-source_5.6.45-1debian9_amd64.deb mysql-community-server_5.6.45-1debian9_amd64.deb mysql-community-client_5.6.45-1debian9_amd64.deb mysql-community-bench_5.6.45-1debian9_amd64.deb mysql-common_5.6.45-1debian9_amd64.deb mysql-client_5.6.45-1debian9_amd64.deb libmysqlclient-dev_5.6.45-1debian9_amd64.deb libmysqlclient18_5.6.45-1debian9_amd64.deb</span><br><span class="line"></span><br><span class="line">sudo apt install -f</span><br></pre></td></tr></table></figure>
+
+<p>该版本中，非 root 用户登录 mysql 的 root 账号不需要 sudo。</p>
+<p>![02(<a href="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/02.png" target="_blank" rel="noopener">https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/02.png</a>)</p>
+<p>接下来看 mysql 5.7。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">sudo rm /etc/apt/sources.list</span><br><span class="line"></span><br><span class="line">sudo echo &apos;deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse \ndeb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse \ndeb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse \ndeb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse \ndeb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse \ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse \ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse \ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse \ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse \ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse&apos; | sudo tee /etc/apt/sources.list</span><br><span class="line"></span><br><span class="line">sudo apt update</span><br><span class="line"></span><br><span class="line">sudo apt install -y neovim apache2 software-properties-common </span><br><span class="line"></span><br><span class="line">sudo add-apt-repository -y ppa:ondrej/php</span><br><span class="line"></span><br><span class="line">sudo apt update</span><br><span class="line"></span><br><span class="line">sudo apt install -y libapache2-mod-php5.6 mysql-server php5.6-mysql</span><br><span class="line"></span><br><span class="line">sudo service apache2 start </span><br><span class="line">sudo serivce mysql start</span><br></pre></td></tr></table></figure>
+
+<p>非 root 用户连接 mysql 中的 root 账号时，如果不用 sudo 权限无法连接。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/04.png" alt="04"></p>
+<p>所以，默认情况下，php 中也无法连接 mysql 数据库。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/05.png" alt="05"></p>
+<p>经测试 mysqli 和 pdo 也无法连接，同理 phpmyadmin 也无法连接。测试 phpmyadmin 的时候，需要先修改 mysql 密码，因为默认 mysql 无密码，此时无法用 phpmyadmin 连接。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo mysql -u root -p</span><br><span class="line">use mysql;</span><br><span class="line">update user set authentication_string=password(&apos;password&apos;) where user = &apos;root&apos;;</span><br><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/06.png" alt="06"></p>
+<p>那 php 无法连接数据库，要如何建站呢？</p>
+<ol>
+<li>可以新建一个数据库用户，新建的用户就不需要用 sudo 权限登录了，使用该用户登录数据库即可。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create user &apos;ll&apos;@&apos;localhost&apos; identified by &apos;llpassword&apos;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/07.png" alt="07"></p>
+<ol>
+<li>修改 plugin 字段。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/08.png" alt="08"></p>
+<p>可以看到刚刚新建的用户和 root 的 plugin 字段内容不同，mysql 5.7 之后，root 用户默认通过 auth_socket 插件进行验证，而不是通过密码。意思就是，上图可以看到 root 是有密码的，但是，当你使用命令<code>sudo mysql -u root -p</code>登录时，是不需要输入该密码，应该验证方式取决于 sudo，可以试试看。</p>
+<p>关于该字段的更多内容可以参考：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://dev.mysql.com/doc/refman/5.7/en/pluggable-authentication.html</span><br><span class="line">https://dev.mysql.com/doc/refman/5.7/en/cleartext-pluggable-authentication.html</span><br></pre></td></tr></table></figure>
+
+<p>修改该字段的值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">update mysql.user set plugin=&apos;mysql_native_password&apos; where user =&apos;root&apos;;</span><br><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
+
+<p>此时就可以登录 phpmyadmin 了。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/09.png" alt="09"></p>
+<h2 id="回到靶场"><a href="#回到靶场" class="headerlink" title="回到靶场"></a>回到靶场</h2><p>想想看题目的 php 是以 root 身份连接数据库的。（注意题目环境是 mariadb，和上述 mysql 分析是有差别的）</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/10.png" alt="10"></p>
+<p>且仅有 root 一个用户。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/11.png" alt="11"></p>
+<p>那为什么网站能正常连接，phpmyadmin 却不能连接呢？理论上，php 能连接，phpmyadmin 也能连接，这就和 phpmyadmin 的配置有关了。</p>
+<p>参考文章：<code>https://blog.csdn.net/cplvfx/article/details/71124523</code></p>
+<blockquote>
+<p>一个MySQL客户可以两种不同的方式连接mysqld服务器：Unix套接字，它通过在文件系统中的一个文件(缺省“/tmp/mysqld.sock”)进行连接；或TCP/IP，它通过一个端口号连接。Unix套接字比TCP/IP更快，但是只有用在连接同一台计算机上的服务器。如果你不指定主机名或如果你指定特殊的主机名localhost，使用Unix套接字。<br>错误(2002）Can’t connect to …通常意味着没有一个MySQL服务器运行在系统上或当试图连接mysqld服务器时，你正在使用一个错误的套接字文件或TCP/IP端口。</p>
+</blockquote>
+<p>所以，我们可以试试拿到 shell 了，改一下 phpmyadmin 的配置文件信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">?a=system(%27cp%20../../phpMyAdmin/config.sample.inc.php%20../../phpMyAdmin/config.inc.php%27);</span><br><span class="line"></span><br><span class="line">?a=system(%27sed%20-i%20&quot;31s/localhost/127.0.0.1/g&quot;%20../../phpMyAdmin/config.inc.php%27);</span><br></pre></td></tr></table></figure>
+
+<p>总结一下，就是复制了根目录的配置文件<code>config.sample.inc.php</code>为<code>config.inc.php</code>，并将其中的 localhost 改为 127.0.0.1。当然，连上菜刀后可以直接可视化修改内容。这样就可以进入 phpMyAdmin 啦。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/12.png" alt="12"></p>
+<p>到这里，只是为了说明关于 mysql 5.7 版本之后连接的问题，即如果不修改 plugin 字段，无法通过 root 登录数据库。可以创建一个新的非 root 的 mysql 用户，则不需要 sudo 连接，因为新建用户的 plugin 字段默认为 mysql_native_password。</p>
+<p>但是这题的测试环境中是 mariadb，且 php 可以不使用 sudo 权限直接登录 mysql 用户，关于这个问题，可以根据上面的砖，自己去发掘一下区别。</p>
+<p>还有就是，我们都拿 shell 了，还要进 phpMyAdmin 做什么？这里只是为了验证一下前述问题，但实际场景还是有的，因为在使用 phpMyAdmin 的时候，可能忘了对 setup 目录做权限限制，这样可能会导致信息泄露，甚至登入进 phpMyAdmin，假设在没拿 shell 的前提下，能登入 phpMyAdmin，可以先看下当前版本，看看有没有现成的洞直接打，写文件 getshell 之类的。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/mysql_5.7_root_%E7%99%BB%E5%BD%95%E9%97%AE%E9%A2%98/13.png" alt="13"></p>
+<p>这里因为没创建 config 配置文件夹，所以不能修改配置，但是可以读一些信息。</p>
+<p>关于该页面导致的权限绕过可以参考：</p>
+<p><code>https://zhuanlan.zhihu.com/p/25887967</code></p>
+
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yoursite.com">ll</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yoursite.com/2019/07/30/mysql_5.7_root_登录问题/">http://yoursite.com/2019/07/30/mysql_5.7_root_登录问题/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
+        <div class="post-tags">
+            <a href="/tags/other/">other</a>
+            </div>
+        
+        <nav class="post-nav"><a class="prev" href="/2019/08/04/CVE-2019-12858-简单分析/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">CVE-2019-12858 简单分析</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    <a class="next" href="/2019/07/25/phpcms_v9.6_sql/">
+        <span class="next-text nav-default">phpcms v9.6.0 sql</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+        <a href="https://github.com/LLfam" class="iconfont icon-github" title="github"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2019<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">ll</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/lib/pjax/jquery.pjax.min.js"></script>
+  <script type="text/javascript" src="/lib/nprogress/nprogress.min.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</body>
+</html>
