@@ -142,7 +142,7 @@
 <p>可以看到，进入 call_user_func_array() 函数的所有参数都可控，但是具体调用哪个类是由 loadModel() 方法决定，传入该方法的 moduleName 参数我们可控。</p>
 <p>跟进 loadModel()。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/%E5%AE%A1%E8%AE%A1%E6%80%9D%E8%80%83%E4%B9%8B%E6%BC%8F%E6%B4%9E%E5%AE%9A%E4%BD%8D/06.png" alt="06"></p>
-<p>这里有两个分支，如果在 loadedModels 变量中找到了 xxModel 类，则返回该类，如果没找到，就调用 setModelFile() 根据 moduleName（可控）去 module 目录下找指定模块的 model.php 中定义的类，实例化后返回。</p>
+<p>这里有两个分支，如果在 loadedModels 变量中找到了<code>[moduleName]Model</code>类，则返回该类，如果没找到，就调用 setModelFile() 根据 moduleName（可控）去 module 目录下找指定模块的 model.php 中定义的类，实例化后返回。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>整理一下审计的思路，跟一遍正常请求，熟悉基本路由，定位危险函数 call_user_func_array()，找到漏洞点 getModel()，因为这是一个路由可以定位到方法，所以参数完全可控，接着就是去构造利用链，关于具体利用方式，可以参考开头的文章，我就不多做分析了。</p>
 <p>其实，我个人觉得这个洞并不是很难发现，因为以前没有审过禅道，一开始以为这个 getModel() 接口是新版本的新功能。但是，我发现在 11.4.1 中就已经存在这个问题了。其实，不光是前面说的 rce 相关的，还有写文件、包含、读文件等函数都可以去定位一遍，根据经验和回溯或许就能发现一些问题。</p>
 
