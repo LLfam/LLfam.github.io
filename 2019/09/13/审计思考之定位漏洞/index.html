@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+<meta name="theme-color" content="#f8f5ec">
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="审计思考之定位漏洞"><meta name="keywords" content="audit, ll"><link rel="alternate" href="/default" title="ll"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://yoursite.com/2019/09/13/审计思考之定位漏洞/">
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":true,"latex":false};
+</script>
+
+    <title>审计思考之定位漏洞 - ll</title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">ll</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags
+          </li>
+      </a><a href="/links/">
+        <li class="mobile-menu-item">Links
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">ll</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags/">
+            Tags
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/links/">
+            Links
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            About
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">审计思考之定位漏洞
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-09-13
+        </span></div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#思考"><span class="toc-text">思考</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前几天禅道出了一个全版本的 rce，今天闲下来稍微看了一遍，实际上，从漏洞发现到找到利用链，从我的角度出发，这应该算是一个定位漏洞函数，然后回溯构造利用链的一个过程。</p>
+<p>参考：<code>http://foreversong.cn/archives/1410</code></p>
+<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>先不谈漏洞，从路由出发，大致了解一下框架的基本路由。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/%E5%AE%A1%E8%AE%A1%E6%80%9D%E8%80%83%E4%B9%8B%E6%BC%8F%E6%B4%9E%E5%AE%9A%E4%BD%8D/01.png" alt="01"></p>
+<p>这里的 requestFix 是<code>-</code>，模块名和方法名是根据 url 中的<code>moduleName-methodName</code>确定，模块名和方法名都经过正则的过滤，防止模块名通过<code>../</code>目录跳转。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">checkCode</span><span class="params">($var)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">self</span>::checkREG($var, <span class="string">'|^[A-Za-z0-9]+$|'</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>setControlFile() 找到控制器文件。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">setControlFile</span><span class="params">($exitIfNone = true)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">$this</span>-&gt;controlFile = <span class="keyword">$this</span>-&gt;moduleRoot . <span class="keyword">$this</span>-&gt;moduleName . DS . <span class="string">'control.php'</span>;</span><br><span class="line">  <span class="keyword">if</span>(file_exists(<span class="keyword">$this</span>-&gt;controlFile)) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终调用的是<code>/module/[moduleName]/control.php</code>中定义的类的 methodName 方法。</p>
+<p>接着，通过反射取到我们传入的 moduleName 和 methodName 指定的方法的默认参数值，没有默认值的用<code>_NOT_SET</code>占位。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/%E5%AE%A1%E8%AE%A1%E6%80%9D%E8%80%83%E4%B9%8B%E6%BC%8F%E6%B4%9E%E5%AE%9A%E4%BD%8D/02.png" alt="02"></p>
+<p>接着从 url 中取实际参数值。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="keyword">$this</span>-&gt;config-&gt;requestType != <span class="string">'GET'</span>) </span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">$this</span>-&gt;setParamsByPathInfo($defaultParams);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>跟进 setParamsByPathInfo()。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/%E5%AE%A1%E8%AE%A1%E6%80%9D%E8%80%83%E4%B9%8B%E6%BC%8F%E6%B4%9E%E5%AE%9A%E4%BD%8D/03.png" alt="03"></p>
+<p>这里的分割符 requestFix 和前面一样是<code>-</code>，从 url 中取出参数值后，和默认值进行 merge。所以，实际的路由为<code>/moduleName-methodName-参数1-参数2...</code>。最终，会调用 module 目录下指定模块文件夹的 control.php 文件中定义的类的方法。当然，根据不同的角色，是有权限控制的。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.php line 67</span></span><br><span class="line">$common-&gt;checkPriv();</span><br></pre></td></tr></table></figure>
+
+<p>下面，从原作者角度出发，原作者本身一开始就是想找 rce 的点，自然我们可以通过正则定位一下危险函数，比如 eval()、system() 等。而大部分面向对象的框架、cms，我们也可以定位一下 call_user_func()、call_user_func_array()，如果传入其中的参数可控，我们可以实现调用任意类的任意方法。</p>
+<p>定位到 /module/api/control.php 的 getModel() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/%E5%AE%A1%E8%AE%A1%E6%80%9D%E8%80%83%E4%B9%8B%E6%BC%8F%E6%B4%9E%E5%AE%9A%E4%BD%8D/04.png" alt="04"></p>
+<p>这个方法是在 module 目录下的 api 模块中，我们是可以直接路由到的，且参数也可控，</p>
+<p>比如，我们访问<code>/api-getModel-moduleName-methodName-test1=llfam,test2=ll</code>。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/%E5%AE%A1%E8%AE%A1%E6%80%9D%E8%80%83%E4%B9%8B%E6%BC%8F%E6%B4%9E%E5%AE%9A%E4%BD%8D/05.png" alt="05"></p>
+<p>可以看到，进入 call_user_func_array() 函数的所有参数都可控，但是具体调用哪个类是由 loadModel() 方法决定，传入该方法的 moduleName 参数我们可控。</p>
+<p>跟进 loadModel()。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/%E5%AE%A1%E8%AE%A1%E6%80%9D%E8%80%83%E4%B9%8B%E6%BC%8F%E6%B4%9E%E5%AE%9A%E4%BD%8D/06.png" alt="06"></p>
+<p>这里有两个分支，如果在 loadedModels 变量中找到了 xxModel 类，则返回该类，如果没找到，就调用 setModelFile() 根据 moduleName（可控）去 module 目录下找指定模块的 model.php 中定义的类，实例化后返回。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>整理一下审计的思路，跟一遍正常请求，熟悉基本路由，定位危险函数 call_user_func_array()，找到漏洞点 getModel()，因为这是一个路由可以定位到方法，所以参数完全可控，接着就是去构造利用链，关于具体利用方式，可以参考开头的文章，我就不多做分析了。</p>
+<p>其实，我个人觉得这个洞并不是很难发现，因为以前没有审过禅道，一开始以为这个 getModel() 接口是新版本的新功能。但是，我发现在 11.4.1 中就已经存在这个问题了。其实，不光是前面说的 rce 相关的，还有写文件、包含、读文件等函数都可以去定位一遍，根据经验和回溯或许就能发现一些问题。</p>
+
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yoursite.com">ll</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yoursite.com/2019/09/13/审计思考之定位漏洞/">http://yoursite.com/2019/09/13/审计思考之定位漏洞/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
+        <div class="post-tags">
+            <a href="/tags/audit/">audit</a>
+            </div>
+        
+        <nav class="post-nav"><a class="next" href="/2019/09/09/xunruicms_4.3.1_xss/">
+        <span class="next-text nav-default">xunruicms 4.3.1 xss</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+        <a href="https://github.com/LLfam" class="iconfont icon-github" title="github"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2019<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">ll</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/lib/pjax/jquery.pjax.min.js"></script>
+  <script type="text/javascript" src="/lib/nprogress/nprogress.min.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</body>
+</html>
