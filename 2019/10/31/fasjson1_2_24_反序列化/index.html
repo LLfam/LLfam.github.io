@@ -110,7 +110,7 @@
     <div class="post-toc" id="post-toc">
     <h2 class="post-toc-title">Contents</h2>
     <div class="post-toc-content">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#poc-分析"><span class="toc-text">poc 分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#调试分析"><span class="toc-text">调试分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#poc-分析"><span class="toc-text">poc 分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#调试分析"><span class="toc-text">调试分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修复"><span class="toc-text">修复</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
     </div>
   </div><div class="post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>fastjson 是阿里巴巴开源的、java 编写的 json 解析库。以速度快、性能高著称。 在 2017 年 3 月 15 日，fastjson 官方主动爆出 fastjson 在 1.2.22 到 1.2.24 版本间存在远程代码执行高危安全漏洞。下面针对该漏洞进行复现并分析。</p>
 <p>official : <code>https://github.com/alibaba/fastjson</code></p>
@@ -190,6 +190,16 @@
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/15.png" alt="15"></p>
 <p>根据前面的分析，TemplatesImpl 中的必要属性已经初始化好了，在调用 getOutputProperties() 方法时，则会触发漏洞。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/16.png" alt="16"></p>
+<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p>在 1.2.23 中加载 @type 指定的类是通过 TypeUtils 的 loadClass() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/17.png" alt="17"></p>
+<p>其中并没有对类名进行检测。后续的 ParserConfig 的 getDeserializer() 方法中，在调用 createJavaBeanDeserializer() 之前进行了一个简单的检查。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/18.png" alt="18"></p>
+<p>在 1.2.25 中，加载 @type 指定类的方法变为 ParserConfig 的 checkAutoType() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/19.png" alt="19"></p>
+<p>其中会对类名进行黑名单检查。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/20.png" alt="20"></p>
+<p>并且在 1.2.25 中，取消了 1.2.23 原先的检查位置。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/21.png" alt="21"></p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这里只是简单地写了一点调试的分析，当作一个学习笔记。但是，实际上有很多东西可能我没有细讲。因为，我觉得审计不能光看，一定要自己去看代码，调试学习。对于同一个洞，每个人审计调试学到的东西可能是不一样的 : ) </p>
 <p>ref :</p>
 <p><code>https://www.freebuf.com/vuls/178012.html</code></p>
