@@ -162,7 +162,7 @@
 <p>我们本义是将<code>\</code>替换为空，可是 preg_replace 函数发生错误返回了 null。猜测下该函数的处理过程，首先 php 中双引号解析第一个参数内容，反斜线<code>\</code>和其后跟的<code>/</code>不组成转义字符，所以直接将<code>/\/</code>传给正则解析器解析，pcre 正则表达式必须包含在一对分割符中，即第一个字符<code>/</code>，所以该字符具有了特殊意义，而正则中也通过反斜线去转义字符，所以后面的表达式结束符<code>/</code>被转义了，这样就没有表达式结束符而导致报错了。</p>
 <p>再看一种写法。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/11.png" alt="11"></p>
-<p>这种情况下，php 解析第一个参数时，反斜线转义了反斜线，变成<code>\/\</code>，到正则解析时还是和上面一样。</p>
+<p>这种情况下，php 解析第一个参数时，反斜线转义了反斜线，变成<code>/\/</code>，到正则解析时还是和上面一样。</p>
 <p>在正则中，<code>\</code>的处理和 php 中有点不同。在 php 中，反斜线如果和紧跟字符不组成转义字符的话，反斜线没有转义功能，变成反斜线字符。而在正则中，反斜线如果和紧跟字符不组成转义字符或表示特殊含义时，就会有反斜线被去除一样的效果。</p>
 <p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/php%E4%B8%AD%E7%9A%84%E8%BD%AC%E4%B9%89%E4%B8%8E%E6%AD%A3%E5%88%99/12.png" alt="12"></p>
 <p>首先，<code>\_abc</code>在 php 的双引号解析中，<code>_</code>本身不需要转义，所以<code>\</code>无转义功能表示为<code>\</code>字符，送到正则解析的内容为<code>\_abc</code>，正则中也没有转义字符<code>\_</code>，这样<code>\</code>没有起到转义效果，直接被去除，最后正则匹配到的内容为<code>_abc</code>。</p>
